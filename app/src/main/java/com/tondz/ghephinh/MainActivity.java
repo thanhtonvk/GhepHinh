@@ -34,6 +34,7 @@ public class MainActivity extends AppCompatActivity {
         init();
         load();
         startActivity(new Intent(getApplicationContext(), TheGioiActivity.class));
+        finish();
     }
 
     private void load() {

@@ -1,4 +1,4 @@
-package com.tondz.ghephinh.activity.chauluc;
+package com.tondz.ghephinh.activity.quocgia;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -15,17 +15,17 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.squareup.picasso.Picasso;
 import com.tondz.ghephinh.AreaActivity;
 import com.tondz.ghephinh.R;
-import com.tondz.ghephinh.activity.quocgia.QuocGiaActivity;
+import com.tondz.ghephinh.activity.khuvuc.KhuVucActivity;
 import com.tondz.ghephinh.models.Entity;
 import com.tondz.ghephinh.utils.Common;
 
 import java.util.List;
 
-public class ChauLucAdapter extends RecyclerView.Adapter<ChauLucAdapter.ViewHolder> {
+public class QuocGiaAdapter extends RecyclerView.Adapter<QuocGiaAdapter.ViewHolder> {
     Context context;
     List<Entity> entityList;
 
-    public ChauLucAdapter(Context context, List<Entity> entityList) {
+    public QuocGiaAdapter(Context context, List<Entity> entityList) {
         this.context = context;
         this.entityList = entityList;
     }
@@ -33,19 +33,19 @@ public class ChauLucAdapter extends RecyclerView.Adapter<ChauLucAdapter.ViewHold
 
     @NonNull
     @Override
-    public ChauLucAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        ChauLucAdapter.ViewHolder viewHolder = new ChauLucAdapter.ViewHolder(LayoutInflater.from(context).inflate(R.layout.item_area, parent, false));
+    public QuocGiaAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        QuocGiaAdapter.ViewHolder viewHolder = new QuocGiaAdapter.ViewHolder(LayoutInflater.from(context).inflate(R.layout.item_area, parent, false));
         return viewHolder;
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ChauLucAdapter.ViewHolder holder, @SuppressLint("RecyclerView") int position) {
+    public void onBindViewHolder(@NonNull QuocGiaAdapter.ViewHolder holder, @SuppressLint("RecyclerView") int position) {
         Entity entity = entityList.get(position);
         holder.tvName.setText(entity.getName());
         Picasso.get().load(entity.getSingle_image_url()).into(holder.imgView);
         holder.itemView.setOnClickListener(v -> {
-            Common.idChauLuc = entity.getId();
-            context.startActivity(new Intent(context, QuocGiaActivity.class));
+            Common.idQuocGia = entity.getId();
+            context.startActivity(new Intent(context, KhuVucActivity.class));
         });
     }
 

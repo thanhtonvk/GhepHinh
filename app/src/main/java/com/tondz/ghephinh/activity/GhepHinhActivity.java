@@ -6,7 +6,9 @@ import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.ClipData;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.DragEvent;
 import android.view.LayoutInflater;
@@ -38,6 +40,9 @@ import com.tondz.ghephinh.databinding.ActivityAreaBinding;
 import com.tondz.ghephinh.databinding.ActivityGhepHinhBinding;
 import com.tondz.ghephinh.models.Entity;
 import com.tondz.ghephinh.utils.Common;
+
+import org.imaginativeworld.whynotimagecarousel.ImageCarousel;
+import org.imaginativeworld.whynotimagecarousel.model.CarouselItem;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -71,7 +76,7 @@ public class GhepHinhActivity extends AppCompatActivity {
         binding.titile.setText(Common.entity.getName());
     }
 
-    private void showImageInfoDialog(String title, String imageUrl, String info) {
+    private void showImageInfoDialog(Entity entity) {
         // Tạo AlertDialog Builder
         AlertDialog.Builder builder = new AlertDialog.Builder(GhepHinhActivity.this);
 
@@ -84,20 +89,32 @@ public class GhepHinhActivity extends AppCompatActivity {
         TextView dialogTitle = dialogView.findViewById(R.id.dialog_title);
         ImageView dialogImage = dialogView.findViewById(R.id.dialog_image);
         TextView dialogInfo = dialogView.findViewById(R.id.dialog_info);
-
-        // Thiết lập dữ liệu
-        dialogTitle.setText(title);
-        dialogInfo.setText(info);
-
-        // Sử dụng Picasso để tải hình ảnh từ URL
+        ImageCarousel carousel = dialogView.findViewById(R.id.carousel);
+        TextView tvYoutube = dialogView.findViewById(R.id.tvVideo);
+        carousel.registerLifecycle(getLifecycle());
+        List<CarouselItem> list = new ArrayList<>();
+        for (String link : entity.getMultiple_image_urls()
+        ) {
+            list.add(
+                    new CarouselItem(
+                            link
+                    )
+            );
+        }
+        carousel.setData(list);
+        dialogTitle.setText(entity.getName());
+        dialogInfo.setText(entity.getInfo());
         Picasso.get()
-                .load(imageUrl)
+                .load(entity.getSingle_image_url())
                 .into(dialogImage);
+        tvYoutube.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(entity.getLink())));
+            }
+        });
 
-        // Tạo Dialog
         AlertDialog dialog = builder.create();
-
-        // Hiển thị Dialog
         dialog.show();
     }
 
@@ -119,7 +136,7 @@ public class GhepHinhActivity extends AppCompatActivity {
             binding.frameLayout.setScaleY(scaleFactor);
         });
         binding.info.setOnClickListener(v -> {
-            showImageInfoDialog(Common.entity.getName(), Common.entity.getSingle_image_url(), Common.entity.getInfo());
+            showImageInfoDialog(Common.entity);
         });
         binding.frameLayout.setOnDragListener(new View.OnDragListener() {
             @Override
@@ -259,15 +276,18 @@ public class GhepHinhActivity extends AppCompatActivity {
     }
 
     private void showDialogArea(int idx) {
+        Entity entity = entityList.get(idx);
+
         AlertDialog.Builder builder = new AlertDialog.Builder(GhepHinhActivity.this);
         builder.setTitle(entityList.get(idx).getName());
         builder.setMessage(entityList.get(idx).getInfo());
 
         // Các tùy chọn khác cho dialog
-        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+        builder.setPositiveButton("Xem chi tiết", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.dismiss();
+                showImageInfoDialog(entity);
             }
         });
 
@@ -278,6 +298,13 @@ public class GhepHinhActivity extends AppCompatActivity {
                 dialog.dismiss();
             }
         });
+        builder.setNeutralButton("Hủy", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+
 
         // Tạo và hiển thị dialog
         AlertDialog dialog = builder.create();

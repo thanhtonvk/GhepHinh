@@ -14,7 +14,7 @@
         android:background="#1565C0"
         android:gravity="center"
         android:padding="10dp"
-        android:text="Chọn châu lục"
+        android:text="Chọn quốc gia"
         android:textColor="@color/white" />
 
     <RelativeLayout
