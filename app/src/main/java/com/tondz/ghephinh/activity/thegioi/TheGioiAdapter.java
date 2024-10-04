@@ -1,4 +1,4 @@
-package com.tondz.ghephinh.adapters;
+package com.tondz.ghephinh.activity.thegioi;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -15,16 +15,17 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.squareup.picasso.Picasso;
 import com.tondz.ghephinh.AreaActivity;
 import com.tondz.ghephinh.R;
+import com.tondz.ghephinh.activity.chauluc.ChauLucActivity;
 import com.tondz.ghephinh.models.Entity;
 import com.tondz.ghephinh.utils.Common;
 
 import java.util.List;
 
-public class AreaAdapter extends RecyclerView.Adapter<AreaAdapter.ViewHolder> {
+public class TheGioiAdapter extends RecyclerView.Adapter<TheGioiAdapter.ViewHolder> {
     Context context;
     List<Entity> entityList;
 
-    public AreaAdapter(Context context, List<Entity> entityList) {
+    public TheGioiAdapter(Context context, List<Entity> entityList) {
         this.context = context;
         this.entityList = entityList;
     }
@@ -43,8 +44,8 @@ public class AreaAdapter extends RecyclerView.Adapter<AreaAdapter.ViewHolder> {
         holder.tvName.setText(entity.getName());
         Picasso.get().load(entity.getSingle_image_url()).into(holder.imgView);
         holder.itemView.setOnClickListener(v -> {
-            Common.index = position;
-            context.startActivity(new Intent(context, AreaActivity.class));
+            Common.idTheGioi = entity.getId();
+            context.startActivity(new Intent(context, ChauLucActivity.class));
         });
     }
 

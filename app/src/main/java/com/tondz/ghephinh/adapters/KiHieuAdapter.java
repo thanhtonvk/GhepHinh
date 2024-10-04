@@ -3,6 +3,7 @@ package com.tondz.ghephinh.adapters;
 import android.content.ClipData;
 import android.content.ClipDescription;
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,19 +15,17 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.squareup.picasso.Picasso;
 import com.tondz.ghephinh.R;
-import com.tondz.ghephinh.models.Entity;
 
 import java.util.List;
 
-public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> {
+public class KiHieuAdapter extends RecyclerView.Adapter<KiHieuAdapter.ViewHolder> {
     Context context;
-    List<Entity> entityList;
+    List<String> kiHieuList;
 
-    public ImageAdapter(Context context, List<Entity> entityList) {
+    public KiHieuAdapter(Context context, List<String> kiHieuList) {
         this.context = context;
-        this.entityList = entityList;
+        this.kiHieuList = kiHieuList;
     }
-
 
     @NonNull
     @Override
@@ -37,8 +36,8 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        Entity entity = entityList.get(position);
-        Picasso.get().load(entity.getSingle_image_url()).into(holder.imgView);
+        String kiHieu = kiHieuList.get(position);
+        Picasso.get().load(kiHieu).into(holder.imgView);
         holder.imgView.setOnLongClickListener(v -> {
             ClipData.Item item = new ClipData.Item(position + "");
             ClipData dragData = new ClipData(position + "", new String[]{ClipDescription.MIMETYPE_TEXT_PLAIN}, item);
@@ -52,11 +51,10 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
 
     @Override
     public int getItemCount() {
-        return entityList.size();
+        return kiHieuList.size();
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {
-
         ImageView imgView;
 
         public ViewHolder(View itemView) {
@@ -66,4 +64,3 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
         }
     }
 }
-

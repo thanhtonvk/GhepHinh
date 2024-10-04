@@ -10,8 +10,20 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.GhepHinh"
+        android:theme="@style/Theme.AppCompat.Light.NoActionBar"
         tools:targetApi="31">
+        <activity
+            android:name=".activity.GhepKiHieuActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activity.GhepHinhActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activity.chauluc.ChauLucActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activity.thegioi.TheGioiActivity"
+            android:exported="false" />
         <activity
             android:name=".AreaActivity"
             android:exported="false" />

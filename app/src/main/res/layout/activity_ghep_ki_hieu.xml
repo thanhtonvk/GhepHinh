@@ -5,7 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".AreaActivity">
+    tools:context=".activity.GhepKiHieuActivity">
 
     <FrameLayout
         android:id="@+id/frameLayout"
@@ -13,7 +13,14 @@
         android:layout_height="fill_parent"
         android:layout_below="@id/titile"
         android:layout_gravity="center"
-        android:background="@color/white" />
+        android:background="@color/white">
+
+        <ImageView
+            android:id="@+id/imgBackground"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerInside" />
+    </FrameLayout>
 
     <ImageView
         android:id="@+id/btnZoomIn"

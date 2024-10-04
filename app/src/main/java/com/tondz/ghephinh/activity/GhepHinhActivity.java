@@ -1,17 +1,13 @@
-package com.tondz.ghephinh;
+package com.tondz.ghephinh.activity;
+
+import static com.tondz.ghephinh.utils.Common.entityList;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.ClipData;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
-import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
-import android.provider.MediaStore;
-import android.util.Log;
 import android.view.DragEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -22,10 +18,12 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.RecyclerView;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -33,56 +31,49 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Target;
+import com.tondz.ghephinh.AreaActivity;
+import com.tondz.ghephinh.R;
 import com.tondz.ghephinh.adapters.ImageAdapter;
 import com.tondz.ghephinh.databinding.ActivityAreaBinding;
+import com.tondz.ghephinh.databinding.ActivityGhepHinhBinding;
 import com.tondz.ghephinh.models.Entity;
 import com.tondz.ghephinh.utils.Common;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AreaActivity extends AppCompatActivity {
-
-    ActivityAreaBinding binding;
+public class GhepHinhActivity extends AppCompatActivity {
+    ActivityGhepHinhBinding binding;
     private ScaleGestureDetector scaleGestureDetector;
     private float scale = 1f;
     private ImageView currentImageView;
     private float lastTouchX, lastTouchY;
     private List<ImageView> imageViewList = new ArrayList<>();
     int currentIndex = -1;
-    List<Entity> entityList = new ArrayList<>();
     ImageAdapter adapter;
-    DatabaseReference reference;
-    FirebaseDatabase database;
     List<Bitmap> bitmapList = new ArrayList<>();
-    Entity currentArea;
     private float scaleFactor = 1.0f;
     private float minScaleFactor = 1.0f;  // Tỷ lệ zoom out tối thiểu (kích thước ban đầu)
     private float maxScaleFactor = 3.0f;  // Tỷ lệ zoom in tối đa
 
-    @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        binding = ActivityAreaBinding.inflate(getLayoutInflater());
+        binding = ActivityGhepHinhBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         onClick();
         init();
-        load();
     }
 
     private void init() {
-        database = FirebaseDatabase.getInstance();
-        reference = database.getReference("data");
         adapter = new ImageAdapter(this, entityList);
         binding.recyclerView.setAdapter(adapter);
+        binding.titile.setText(Common.entity.getName());
     }
 
     private void showImageInfoDialog(String title, String imageUrl, String info) {
         // Tạo AlertDialog Builder
-        AlertDialog.Builder builder = new AlertDialog.Builder(AreaActivity.this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(GhepHinhActivity.this);
 
         // Inflate layout cho Dialog
         LayoutInflater inflater = getLayoutInflater();
@@ -110,35 +101,6 @@ public class AreaActivity extends AppCompatActivity {
         dialog.show();
     }
 
-    private void load() {
-        reference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                int i = 0;
-                entityList.clear();
-                bitmapList.clear();
-                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                    if (i == Common.index) {
-                        Entity area = dataSnapshot.getValue(Entity.class);
-                        currentArea = area;
-                        binding.titile.setText(area.getName());
-                        dataSnapshot.child("data").getChildren().forEach(dataSnapshot1 -> {
-                            Entity entity = dataSnapshot1.getValue(Entity.class);
-                            entityList.add(entity);
-                            adapter.notifyDataSetChanged();
-                        });
-                        break;
-                    }
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
-    }
-
 
     @SuppressLint("ClickableViewAccessibility")
     void onClick() {
@@ -157,7 +119,7 @@ public class AreaActivity extends AppCompatActivity {
             binding.frameLayout.setScaleY(scaleFactor);
         });
         binding.info.setOnClickListener(v -> {
-            showImageInfoDialog(currentArea.getName(), currentArea.getSingle_image_url(), currentArea.getInfo());
+            showImageInfoDialog(Common.entity.getName(), Common.entity.getSingle_image_url(), Common.entity.getInfo());
         });
         binding.frameLayout.setOnDragListener(new View.OnDragListener() {
             @Override
@@ -178,7 +140,7 @@ public class AreaActivity extends AppCompatActivity {
                         final float dropY = event.getY();
                         ClipData.Item item = event.getClipData().getItemAt(0);
                         Integer chooseIdx = Integer.parseInt(item.getText().toString());
-                        ImageView imageView = new ImageView(AreaActivity.this);
+                        ImageView imageView = new ImageView(GhepHinhActivity.this);
                         Picasso.get().load(entityList.get(chooseIdx).getSingle_image_url()).into(imageView);
                         imageView.setScaleX(0.5f);
                         imageView.setScaleY(0.5f);
@@ -201,7 +163,7 @@ public class AreaActivity extends AppCompatActivity {
                 return false;
             }
         });
-        scaleGestureDetector = new ScaleGestureDetector(this, new AreaActivity.ScaleListener());
+        scaleGestureDetector = new ScaleGestureDetector(this, new GhepHinhActivity.ScaleListener());
         binding.frameLayout.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent event) {
@@ -297,7 +259,7 @@ public class AreaActivity extends AppCompatActivity {
     }
 
     private void showDialogArea(int idx) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(AreaActivity.this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(GhepHinhActivity.this);
         builder.setTitle(entityList.get(idx).getName());
         builder.setMessage(entityList.get(idx).getInfo());
 
