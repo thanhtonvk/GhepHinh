@@ -8,14 +8,19 @@ import android.content.ClipData;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.CountDownTimer;
+import android.text.InputType;
 import android.view.DragEvent;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -43,6 +48,7 @@ import com.tondz.ghephinh.utils.Common;
 
 import org.imaginativeworld.whynotimagecarousel.ImageCarousel;
 import org.imaginativeworld.whynotimagecarousel.model.CarouselItem;
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,10 +62,12 @@ public class GhepHinhActivity extends AppCompatActivity {
     private List<ImageView> imageViewList = new ArrayList<>();
     int currentIndex = -1;
     ImageAdapter adapter;
-    List<Bitmap> bitmapList = new ArrayList<>();
     private float scaleFactor = 1.0f;
     private float minScaleFactor = 1.0f;  // Tỷ lệ zoom out tối thiểu (kích thước ban đầu)
     private float maxScaleFactor = 3.0f;  // Tỷ lệ zoom in tối đa
+    private CountDownTimer countDownTimer;
+    private long timeLeftInMillis = 60000; // 1 phút
+    private boolean canEdit = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,6 +76,57 @@ public class GhepHinhActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
         onClick();
         init();
+        showInputTimeDialog();
+
+    }
+
+    private void startTimer() {
+        countDownTimer = new CountDownTimer(timeLeftInMillis, 1000) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+                timeLeftInMillis = millisUntilFinished;
+                updateCountdownText();
+            }
+
+            @Override
+            public void onFinish() {
+                binding.countdownText.setText("Hết thời gian");
+            }
+        }.start();
+    }
+
+    private void updateCountdownText() {
+        int minutes = (int) (timeLeftInMillis / 1000) / 60;
+        int seconds = (int) (timeLeftInMillis / 1000) % 60;
+        String timeFormatted = String.format("%02d:%02d", minutes, seconds);
+        binding.countdownText.setText(timeFormatted);
+    }
+
+    private void showInputTimeDialog() {
+        // Sử dụng LayoutInflater để nạp layout dialog_input_time.xml
+        LayoutInflater inflater = LayoutInflater.from(this);
+        View dialogView = inflater.inflate(R.layout.dialog_input_time, null);
+
+        // Khai báo EditText từ dialog layout
+        EditText editTextTime = dialogView.findViewById(R.id.editTextTime);
+        editTextTime.setInputType(InputType.TYPE_CLASS_NUMBER);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setView(dialogView) // Đặt view cho dialog
+                .setTitle("Bạn đã sẵn sàng chưa?")
+                .setPositiveButton("OK", (dialog, which) -> {
+                    // Xử lý khi người dùng nhấn "OK"
+                    String timeInput = editTextTime.getText().toString();
+                    if (!timeInput.isEmpty()) {
+                        int time = Integer.parseInt(timeInput);
+                        timeLeftInMillis = time * 1000; // Chuyển đổi sang mili giây
+                        startTimer();
+                    }
+                })
+                .setNegativeButton("Huỷ", (dialog, which) -> dialog.dismiss());
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
     }
 
     private void init() {
@@ -118,9 +177,61 @@ public class GhepHinhActivity extends AppCompatActivity {
         dialog.show();
     }
 
+    private void showDialogNote() {
+        // Sử dụng LayoutInflater để nạp layout dialog_input_time.xml
+        LayoutInflater inflater = LayoutInflater.from(this);
+        View dialogView = inflater.inflate(R.layout.dialog_input_time, null);
+
+        // Khai báo EditText từ dialog layout
+        EditText editTextTime = dialogView.findViewById(R.id.editTextTime);
+        editTextTime.setInputType(InputType.TYPE_CLASS_TEXT);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setView(dialogView) // Đặt view cho dialog
+                .setTitle("Nhập nội dung note: ")
+                .setPositiveButton("OK", (dialog, which) -> {
+                    // Xử lý khi người dùng nhấn "OK"
+                    String noteInput = editTextTime.getText().toString();
+                    if (!noteInput.isEmpty()) {
+                        // Tạo một TextView mới
+                        TextView textView = new TextView(GhepHinhActivity.this);
+                        textView.setText(noteInput);
+                        textView.setTextSize(20);
+                        textView.setTextColor(Color.BLACK);
+
+                        // Đặt LayoutParams cho TextView
+                        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
+                                FrameLayout.LayoutParams.WRAP_CONTENT,
+                                FrameLayout.LayoutParams.WRAP_CONTENT
+                        );
+                        params.gravity = Gravity.CENTER; // Đặt vị trí của TextView trong FrameLayout
+
+                        // Kiểm tra nếu TextView đã có parent, nếu có thì loại bỏ nó khỏi parent
+                        if (textView.getParent() != null) {
+                            ((ViewGroup) textView.getParent()).removeView(textView);
+                        }
+
+                        // Thêm TextView vào FrameLayout
+                        binding.frameLayout.addView(textView, params);
+
+                        setTouchTextView(textView); // Nếu bạn cần touch listener cho hình ảnh, hãy bật lại dòng này
+                    }
+                })
+                .setNegativeButton("Huỷ", (dialog, which) -> dialog.dismiss());
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
 
     @SuppressLint("ClickableViewAccessibility")
     void onClick() {
+        binding.btnNote.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showDialogNote();
+            }
+        });
         binding.btnZoomIn.setOnClickListener(v -> {
             scaleFactor += 0.1f;
             scaleFactor = Math.min(scaleFactor, maxScaleFactor); // Giới hạn tỷ lệ zoom in tối đa
@@ -219,6 +330,38 @@ public class GhepHinhActivity extends AppCompatActivity {
                 child.animate().x(newX).y(newY).setDuration(0).start();
             }
         }
+    }
+
+    TextView currentTextView;
+
+    @SuppressLint("ClickableViewAccessibility")
+    private void setTouchTextView(TextView textView) {
+        textView.setOnTouchListener(new View.OnTouchListener() {
+            private float lastTouchX;
+            private float lastTouchY;
+            private float dX, dY;
+
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        currentTextView = textView;
+                        lastTouchX = event.getRawX();
+                        lastTouchY = event.getRawY();
+                        dX = v.getX() - lastTouchX;
+                        dY = v.getY() - lastTouchY;
+                        break;
+
+                    case MotionEvent.ACTION_MOVE:
+                        float newX = event.getRawX() + dX;
+                        float newY = event.getRawY() + dY;
+                        v.setX(newX);
+                        v.setY(newY);
+                        break;
+                }
+                return true;
+            }
+        });
     }
 
     @SuppressLint("ClickableViewAccessibility")
