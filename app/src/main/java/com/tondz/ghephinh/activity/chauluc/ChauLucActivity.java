@@ -92,6 +92,7 @@ public class ChauLucActivity extends AppCompatActivity {
                         Common.entity = snapshot.getValue(Entity.class);
                         dialogKiHieu();
                     }
+
                     @Override
                     public void onCancelled(@NonNull DatabaseError error) {
 
@@ -105,7 +106,7 @@ public class ChauLucActivity extends AppCompatActivity {
     private void dialogKiHieu() {
         Dialog dialog = new Dialog(this);
         dialog.setContentView(R.layout.dialog_ki_hieu);
-        KiHieuTextAdapter kiHieuTextAdapter = new KiHieuTextAdapter(dialog.getContext(), Common.kiHieuList);
+        KiHieuTextAdapter kiHieuTextAdapter = new KiHieuTextAdapter(dialog.getContext(), Common.loaiKiHieuList);
         RecyclerView recyclerView = dialog.findViewById(R.id.kiHieuRecyclerView);
         recyclerView.setAdapter(kiHieuTextAdapter);
         dialog.show();

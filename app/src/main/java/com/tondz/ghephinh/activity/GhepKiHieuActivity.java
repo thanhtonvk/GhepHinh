@@ -1,11 +1,16 @@
 package com.tondz.ghephinh.activity;
 
 
+import static com.tondz.ghephinh.utils.Common.entityList;
+import static com.tondz.ghephinh.utils.Common.kiHieuList;
+
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.ClipData;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.DragEvent;
 import android.view.LayoutInflater;
@@ -27,7 +32,12 @@ import com.squareup.picasso.Picasso;
 import com.tondz.ghephinh.R;
 import com.tondz.ghephinh.adapters.KiHieuAdapter;
 import com.tondz.ghephinh.databinding.ActivityGhepKiHieuBinding;
+import com.tondz.ghephinh.models.Entity;
+import com.tondz.ghephinh.models.KiHieu;
 import com.tondz.ghephinh.utils.Common;
+
+import org.imaginativeworld.whynotimagecarousel.ImageCarousel;
+import org.imaginativeworld.whynotimagecarousel.model.CarouselItem;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,7 +66,7 @@ public class GhepKiHieuActivity extends AppCompatActivity {
     }
 
     private void init() {
-        adapter = new KiHieuAdapter(this, Common.kiHieu.getMultiple_image_urls());
+        adapter = new KiHieuAdapter(this, Common.kiHieuList);
         binding.recyclerView.setAdapter(adapter);
         binding.titile.setText(Common.entity.getName());
     }
@@ -131,7 +141,7 @@ public class GhepKiHieuActivity extends AppCompatActivity {
                         ClipData.Item item = event.getClipData().getItemAt(0);
                         Integer chooseIdx = Integer.parseInt(item.getText().toString());
                         ImageView imageView = new ImageView(GhepKiHieuActivity.this);
-                        Picasso.get().load(Common.kiHieu.getMultiple_image_urls().get(chooseIdx)).into(imageView);
+                        Picasso.get().load(Common.kiHieuList.get(chooseIdx).getSingle_image_url()).into(imageView);
                         imageView.setScaleX(0.5f);
                         imageView.setScaleY(0.5f);
 
@@ -194,6 +204,84 @@ public class GhepKiHieuActivity extends AppCompatActivity {
         }
     }
 
+    private void showDialogArea(int idx) {
+        KiHieu entity = kiHieuList.get(idx);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(GhepKiHieuActivity.this);
+        builder.setTitle(kiHieuList.get(idx).getName());
+        builder.setMessage(kiHieuList.get(idx).getInfo());
+
+        // Các tùy chọn khác cho dialog
+        builder.setPositiveButton("Xem chi tiết", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+                showImageInfoDialog(entity);
+            }
+        });
+
+        builder.setNegativeButton("Xoá", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                binding.frameLayout.removeView(imageViewList.get(currentIndex));
+                dialog.dismiss();
+            }
+        });
+        builder.setNeutralButton("Hủy", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+
+
+        // Tạo và hiển thị dialog
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
+    private void showImageInfoDialog(KiHieu entity) {
+        // Tạo AlertDialog Builder
+        AlertDialog.Builder builder = new AlertDialog.Builder(GhepKiHieuActivity.this);
+
+        // Inflate layout cho Dialog
+        LayoutInflater inflater = getLayoutInflater();
+        View dialogView = inflater.inflate(R.layout.dialog_image_info, null);
+        builder.setView(dialogView);
+
+        // Ánh xạ các thành phần trong layout
+        TextView dialogTitle = dialogView.findViewById(R.id.dialog_title);
+        ImageView dialogImage = dialogView.findViewById(R.id.dialog_image);
+        TextView dialogInfo = dialogView.findViewById(R.id.dialog_info);
+        ImageCarousel carousel = dialogView.findViewById(R.id.carousel);
+        TextView tvYoutube = dialogView.findViewById(R.id.tvVideo);
+        carousel.registerLifecycle(getLifecycle());
+        List<CarouselItem> list = new ArrayList<>();
+        for (String link : entity.getMultiple_image_urls()
+        ) {
+            list.add(
+                    new CarouselItem(
+                            link
+                    )
+            );
+        }
+        carousel.setData(list);
+        dialogTitle.setText(entity.getName());
+        dialogInfo.setText(entity.getInfo());
+        Picasso.get()
+                .load(entity.getSingle_image_url())
+                .into(dialogImage);
+        tvYoutube.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(entity.getLink())));
+            }
+        });
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
     @SuppressLint("ClickableViewAccessibility")
     private void setTouchListener(ImageView imageView) {
         imageView.setOnTouchListener(new View.OnTouchListener() {
@@ -226,6 +314,12 @@ public class GhepKiHieuActivity extends AppCompatActivity {
                             clickCount = 1; // Reset click count nếu thời gian giữa các click quá lâu
                         }
                         lastClickTime = currentTime;
+                        // Kiểm tra nếu là double click
+                        if (clickCount == 2) {
+                            int idx = imageViewList.indexOf(currentImageView);
+                            showDialogArea(idx);
+                            clickCount = 0; // Reset sau khi phát hiện double click
+                        }
 
 
                         break;

@@ -35,13 +35,13 @@ public class TheGioiActivity extends AppCompatActivity {
 
     private void init() {
         database = FirebaseDatabase.getInstance();
-        reference = database.getReference("TheGioi");
+        reference = database.getReference();
         adapter = new TheGioiAdapter(TheGioiActivity.this, entityList);
         binding.recyclerView.setAdapter(adapter);
     }
 
     private void loadData() {
-        reference.addValueEventListener(new ValueEventListener() {
+        reference.child("TheGioi").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 entityList.clear();
@@ -50,7 +50,23 @@ public class TheGioiActivity extends AppCompatActivity {
                     Entity entity = dataSnapshot.getValue(Entity.class);
                     entityList.add(entity);
                 }
+                loadVietNam();
                 adapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    private void loadVietNam() {
+        reference.child("QuocGia").child("0").child("41").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                Entity entity = snapshot.getValue(Entity.class);
+                entityList.add(entity);
             }
 
             @Override

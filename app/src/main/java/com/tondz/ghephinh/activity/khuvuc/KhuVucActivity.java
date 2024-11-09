@@ -103,7 +103,7 @@ public class KhuVucActivity extends AppCompatActivity {
     private void dialogKiHieu() {
         Dialog dialog = new Dialog(this);
         dialog.setContentView(R.layout.dialog_ki_hieu);
-        KiHieuTextAdapter kiHieuTextAdapter = new KiHieuTextAdapter(dialog.getContext(), Common.kiHieuList);
+        KiHieuTextAdapter kiHieuTextAdapter = new KiHieuTextAdapter(dialog.getContext(), Common.loaiKiHieuList);
         RecyclerView recyclerView = dialog.findViewById(R.id.kiHieuRecyclerView);
         recyclerView.setAdapter(kiHieuTextAdapter);
         dialog.show();

@@ -43,7 +43,9 @@ public class TinhAdapter extends RecyclerView.Adapter<TinhAdapter.ViewHolder> {
     public void onBindViewHolder(@NonNull TinhAdapter.ViewHolder holder, @SuppressLint("RecyclerView") int position) {
         Entity entity = entityList.get(position);
         holder.tvName.setText(entity.getName());
-        Picasso.get().load(entity.getSingle_image_url()).into(holder.imgView);
+        if (!entity.getSingle_image_url().isEmpty()) {
+            Picasso.get().load(entity.getSingle_image_url()).into(holder.imgView);
+        }
         holder.itemView.setOnClickListener(v -> {
             Common.idTinh = entity.getId();
             context.startActivity(new Intent(context, HuyenActivity.class));

@@ -42,7 +42,9 @@ public class KhuVucAdapter extends RecyclerView.Adapter<KhuVucAdapter.ViewHolder
     public void onBindViewHolder(@NonNull KhuVucAdapter.ViewHolder holder, @SuppressLint("RecyclerView") int position) {
         Entity entity = entityList.get(position);
         holder.tvName.setText(entity.getName());
-        Picasso.get().load(entity.getSingle_image_url()).into(holder.imgView);
+        if (!entity.getSingle_image_url().isEmpty()) {
+            Picasso.get().load(entity.getSingle_image_url()).into(holder.imgView);
+        }
         holder.itemView.setOnClickListener(v -> {
             Common.idKhuVuc = entity.getId();
             context.startActivity(new Intent(context, TinhActivity.class));

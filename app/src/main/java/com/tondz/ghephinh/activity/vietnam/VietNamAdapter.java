@@ -1,4 +1,4 @@
-package com.tondz.ghephinh.activity.quocgia;
+package com.tondz.ghephinh.activity.vietnam;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -13,19 +13,18 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.squareup.picasso.Picasso;
-import com.tondz.ghephinh.AreaActivity;
 import com.tondz.ghephinh.R;
-import com.tondz.ghephinh.activity.khuvuc.KhuVucActivity;
+import com.tondz.ghephinh.activity.huyen.HuyenActivity;
 import com.tondz.ghephinh.models.Entity;
 import com.tondz.ghephinh.utils.Common;
 
 import java.util.List;
 
-public class QuocGiaAdapter extends RecyclerView.Adapter<QuocGiaAdapter.ViewHolder> {
+public class VietNamAdapter extends RecyclerView.Adapter<VietNamAdapter.ViewHolder> {
     Context context;
     List<Entity> entityList;
 
-    public QuocGiaAdapter(Context context, List<Entity> entityList) {
+    public VietNamAdapter(Context context, List<Entity> entityList) {
         this.context = context;
         this.entityList = entityList;
     }
@@ -33,23 +32,18 @@ public class QuocGiaAdapter extends RecyclerView.Adapter<QuocGiaAdapter.ViewHold
 
     @NonNull
     @Override
-    public QuocGiaAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        QuocGiaAdapter.ViewHolder viewHolder = new QuocGiaAdapter.ViewHolder(LayoutInflater.from(context).inflate(R.layout.item_area, parent, false));
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        ViewHolder viewHolder = new ViewHolder(LayoutInflater.from(context).inflate(R.layout.item_area, parent, false));
         return viewHolder;
     }
 
     @Override
-    public void onBindViewHolder(@NonNull QuocGiaAdapter.ViewHolder holder, @SuppressLint("RecyclerView") int position) {
+    public void onBindViewHolder(@NonNull ViewHolder holder, @SuppressLint("RecyclerView") int position) {
         Entity entity = entityList.get(position);
         holder.tvName.setText(entity.getName());
         if (!entity.getSingle_image_url().isEmpty()) {
             Picasso.get().load(entity.getSingle_image_url()).into(holder.imgView);
         }
-
-        holder.itemView.setOnClickListener(v -> {
-            Common.idQuocGia = entity.getId();
-            context.startActivity(new Intent(context, KhuVucActivity.class));
-        });
     }
 
     @Override

@@ -4,6 +4,7 @@ import com.tondz.ghephinh.models.Entity;
 import com.tondz.ghephinh.models.KiHieu;
 
 import java.util.List;
+import java.util.Set;
 
 public class Common {
     public static int index;
@@ -13,6 +14,7 @@ public class Common {
     public static List<Entity> entityList;
     public static Entity entity;
     public static List<KiHieu> kiHieuList;
+    public static Set<String> loaiKiHieuList;
     public static KiHieu kiHieu;
 
 }

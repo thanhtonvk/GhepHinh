@@ -15,14 +15,15 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.squareup.picasso.Picasso;
 import com.tondz.ghephinh.R;
+import com.tondz.ghephinh.models.KiHieu;
 
 import java.util.List;
 
 public class KiHieuAdapter extends RecyclerView.Adapter<KiHieuAdapter.ViewHolder> {
     Context context;
-    List<String> kiHieuList;
+    List<KiHieu> kiHieuList;
 
-    public KiHieuAdapter(Context context, List<String> kiHieuList) {
+    public KiHieuAdapter(Context context, List<KiHieu> kiHieuList) {
         this.context = context;
         this.kiHieuList = kiHieuList;
     }
@@ -36,8 +37,8 @@ public class KiHieuAdapter extends RecyclerView.Adapter<KiHieuAdapter.ViewHolder
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        String kiHieu = kiHieuList.get(position);
-        Picasso.get().load(kiHieu).into(holder.imgView);
+        KiHieu kiHieu = kiHieuList.get(position);
+        Picasso.get().load(kiHieu.getSingle_image_url()).into(holder.imgView);
         holder.imgView.setOnLongClickListener(v -> {
             ClipData.Item item = new ClipData.Item(position + "");
             ClipData dragData = new ClipData(position + "", new String[]{ClipDescription.MIMETYPE_TEXT_PLAIN}, item);

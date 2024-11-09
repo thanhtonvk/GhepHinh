@@ -1,8 +1,9 @@
-package com.tondz.ghephinh.activity.quocgia;
+package com.tondz.ghephinh.activity.vietnam;
 
 import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 
 import androidx.annotation.NonNull;
@@ -16,28 +17,26 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.tondz.ghephinh.R;
 import com.tondz.ghephinh.activity.GhepHinhActivity;
-import com.tondz.ghephinh.activity.quocgia.QuocGiaAdapter;
 import com.tondz.ghephinh.adapters.KiHieuTextAdapter;
-import com.tondz.ghephinh.databinding.ActivityChauLucBinding;
-import com.tondz.ghephinh.databinding.ActivityQuocGiaBinding;
+import com.tondz.ghephinh.databinding.ActivityVietNamBinding;
 import com.tondz.ghephinh.models.Entity;
 import com.tondz.ghephinh.utils.Common;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class QuocGiaActivity extends AppCompatActivity {
+public class VietNamActivity extends AppCompatActivity {
 
-    ActivityQuocGiaBinding binding;
+    ActivityVietNamBinding binding;
     DatabaseReference reference;
     FirebaseDatabase database;
     List<Entity> entityList = new ArrayList<>();
-    QuocGiaAdapter adapter;
+    VietNamAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        binding = ActivityQuocGiaBinding.inflate(getLayoutInflater());
+        binding = ActivityVietNamBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         init();
         loadData();
@@ -48,16 +47,17 @@ public class QuocGiaActivity extends AppCompatActivity {
         binding.btnGhepHinh.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                reference.child("QuocGia").child(Common.idChauLuc).addValueEventListener(new ValueEventListener() {
+                reference.child("Vietnam").addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        Log.e("TAG", "dataget " + snapshot.toString());
                         Common.entityList = new ArrayList<>();
                         for (DataSnapshot dataSnapshot :
                                 snapshot.getChildren()) {
                             Entity entity = dataSnapshot.getValue(Entity.class);
                             Common.entityList.add(entity);
                         }
-                        reference.child("ChauLuc").child(Common.idTheGioi).child(Common.idChauLuc).addValueEventListener(new ValueEventListener() {
+                        reference.child("QuocGia").child("0").child("41").addValueEventListener(new ValueEventListener() {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot snapshot) {
                                 Common.entity = snapshot.getValue(Entity.class);
@@ -83,7 +83,7 @@ public class QuocGiaActivity extends AppCompatActivity {
         binding.btnGhepKiHieu.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                reference.child("ChauLuc").child(Common.idTheGioi).child(Common.idChauLuc).addValueEventListener(new ValueEventListener() {
+                reference.child("QuocGia").child("0").child("41").addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         Common.entity = snapshot.getValue(Entity.class);
@@ -114,24 +114,19 @@ public class QuocGiaActivity extends AppCompatActivity {
     private void init() {
         database = FirebaseDatabase.getInstance();
         reference = database.getReference();
-        adapter = new QuocGiaAdapter(this, entityList);
+        adapter = new VietNamAdapter(this, entityList);
         binding.recyclerView.setAdapter(adapter);
     }
 
     private void loadData() {
-        reference.child("QuocGia").child(Common.idChauLuc).addValueEventListener(new ValueEventListener() {
+        reference.child("Vietnam").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 entityList.clear();
                 for (DataSnapshot dataSnapshot :
                         snapshot.getChildren()) {
-                    try {
-                        Entity entity = dataSnapshot.getValue(Entity.class);
-                        entityList.add(entity);
-                    } catch (Exception e) {
-
-                    }
-
+                    Entity entity = dataSnapshot.getValue(Entity.class);
+                    entityList.add(entity);
                 }
                 adapter.notifyDataSetChanged();
             }
