@@ -13,6 +13,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.text.InputType;
+import android.util.Log;
 import android.view.DragEvent;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -40,6 +41,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 import com.tondz.ghephinh.AreaActivity;
 import com.tondz.ghephinh.R;
+import com.tondz.ghephinh.activity.cauhoi.CauHoiActivity;
 import com.tondz.ghephinh.adapters.ImageAdapter;
 import com.tondz.ghephinh.databinding.ActivityAreaBinding;
 import com.tondz.ghephinh.databinding.ActivityGhepHinhBinding;
@@ -68,6 +70,7 @@ public class GhepHinhActivity extends AppCompatActivity {
     private CountDownTimer countDownTimer;
     private long timeLeftInMillis = 60000; // 1 phút
     private boolean canEdit = true;
+    private List<Integer> idxTemp = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,7 +80,6 @@ public class GhepHinhActivity extends AppCompatActivity {
         onClick();
         init();
         showInputTimeDialog();
-
     }
 
     private void startTimer() {
@@ -249,6 +251,12 @@ public class GhepHinhActivity extends AppCompatActivity {
         binding.info.setOnClickListener(v -> {
             showImageInfoDialog(Common.entity);
         });
+        binding.question.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(getApplicationContext(), CauHoiActivity.class));
+            }
+        });
         binding.frameLayout.setOnDragListener(new View.OnDragListener() {
             @Override
             public boolean onDrag(View v, DragEvent event) {
@@ -267,7 +275,9 @@ public class GhepHinhActivity extends AppCompatActivity {
                         final float dropX = event.getX();
                         final float dropY = event.getY();
                         ClipData.Item item = event.getClipData().getItemAt(0);
+
                         Integer chooseIdx = Integer.parseInt(item.getText().toString());
+
                         ImageView imageView = new ImageView(GhepHinhActivity.this);
                         Picasso.get().load(entityList.get(chooseIdx).getSingle_image_url()).into(imageView);
                         imageView.setScaleX(0.5f);
@@ -280,7 +290,8 @@ public class GhepHinhActivity extends AppCompatActivity {
                         binding.frameLayout.addView(imageView);
                         setTouchListener(imageView);
                         imageViewList.add(imageView);
-
+                        idxTemp.add(chooseIdx);
+                        Log.e("TAG", "onDrag: " + entityList.get(chooseIdx).getName());
                         return true;
                     case DragEvent.ACTION_DRAG_ENDED:
                         return true;
@@ -324,7 +335,7 @@ public class GhepHinhActivity extends AppCompatActivity {
     private void moveAllImages(float dX, float dY) {
         for (int i = 0; i < binding.frameLayout.getChildCount(); i++) {
             View child = binding.frameLayout.getChildAt(i);
-            if (child instanceof ImageView) {
+            if (child instanceof ImageView || child instanceof TextView) {
                 float newX = child.getX() + dX;
                 float newY = child.getY() + dY;
                 child.animate().x(newX).y(newY).setDuration(0).start();
@@ -399,7 +410,8 @@ public class GhepHinhActivity extends AppCompatActivity {
 
                         // Kiểm tra nếu là double click
                         if (clickCount == 2) {
-                            int idx = imageViewList.indexOf(currentImageView);
+                            int idx = idxTemp.get(imageViewList.indexOf(currentImageView));
+                            Log.e("TAG", "onTouch: " + idx);
                             showDialogArea(idx);
                             clickCount = 0; // Reset sau khi phát hiện double click
                         }
@@ -438,6 +450,8 @@ public class GhepHinhActivity extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 binding.frameLayout.removeView(imageViewList.get(currentIndex));
+                imageViewList.remove(currentIndex);
+                idxTemp.remove(currentIndex);
                 dialog.dismiss();
             }
         });
@@ -459,7 +473,7 @@ public class GhepHinhActivity extends AppCompatActivity {
         public boolean onScale(ScaleGestureDetector detector) {
             if (currentImageView != null) {
                 scale *= detector.getScaleFactor();
-                scale = Math.max(0.1f, Math.min(scale, 5.0f)); // Giới hạn scale từ 0.1x đến 5x
+                scale = Math.max(0.1f, Math.min(scale, 10.0f)); // Giới hạn scale từ 0.1x đến 5x
                 ViewGroup.LayoutParams params = null;
                 params = currentImageView.getLayoutParams();
                 params.width = (int) (currentImageView.getDrawable().getIntrinsicWidth() * scale);

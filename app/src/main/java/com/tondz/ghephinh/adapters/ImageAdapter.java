@@ -3,6 +3,7 @@ package com.tondz.ghephinh.adapters;
 import android.content.ClipData;
 import android.content.ClipDescription;
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,13 +39,14 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Entity entity = entityList.get(position);
-        Picasso.get().load(entity.getSingle_image_url()).into(holder.imgView);
+        if (!entity.getSingle_image_url().isEmpty()) {
+            Picasso.get().load(entity.getSingle_image_url()).into(holder.imgView);
+        }
         holder.imgView.setOnLongClickListener(v -> {
             ClipData.Item item = new ClipData.Item(position + "");
             ClipData dragData = new ClipData(position + "", new String[]{ClipDescription.MIMETYPE_TEXT_PLAIN}, item);
-
+            Log.e("TAG", "onBindViewHolder: "+entity.getName() );
             View.DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(holder.imgView);
-
             v.startDragAndDrop(dragData, shadowBuilder, null, 0);
             return true;
         });

@@ -19,7 +19,7 @@
             android:id="@+id/imgBackground"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:scaleType="centerInside" />
+            android:scaleType="fitCenter" />
     </FrameLayout>
 
     <ImageView
@@ -41,6 +41,17 @@
         android:background="#00FFFFFF"
         android:src="@drawable/baseline_zoom_out_24" />
 
+    <ImageView
+        android:id="@+id/btnNote"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_above="@id/recyclerView"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="10dp"
+        android:layout_marginBottom="20dp"
+        android:background="#00FFFFFF"
+        android:src="@drawable/baseline_edit_24" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"
@@ -49,12 +60,14 @@
         android:orientation="horizontal"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
+
     <TextView
+
         android:id="@+id/titile"
         android:layout_width="match_parent"
         android:layout_height="48dp"
         android:background="#2196F3"
-        android:gravity="center_vertical"
+        android:gravity="center"
         android:padding="10dp"
         android:textColor="@color/white" />
 

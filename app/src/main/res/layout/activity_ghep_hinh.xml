@@ -55,11 +55,12 @@
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
     <TextView
+
         android:id="@+id/titile"
         android:layout_width="match_parent"
         android:layout_height="48dp"
         android:background="#2196F3"
-        android:gravity="center_vertical"
+        android:gravity="center"
         android:padding="10dp"
         android:textColor="@color/white" />
 
@@ -79,4 +80,11 @@
         android:layout_height="48dp"
         android:layout_alignParentRight="true"
         android:src="@drawable/baseline_info_outline_24" />
+
+    <ImageView
+        android:id="@+id/question"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_alignParentLeft="true"
+        android:src="@drawable/baseline_question_answer_24" />
 </RelativeLayout>

@@ -10,14 +10,18 @@ import android.content.ClipData;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.InputType;
 import android.view.DragEvent;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -53,7 +57,8 @@ public class GhepKiHieuActivity extends AppCompatActivity {
     KiHieuAdapter adapter;
     private float scaleFactor = 1.0f;
     private float minScaleFactor = 1.0f;  // Tỷ lệ zoom out tối thiểu (kích thước ban đầu)
-    private float maxScaleFactor = 3.0f;  // Tỷ lệ zoom in tối đa
+    private float maxScaleFactor = 10.0f;  // Tỷ lệ zoom in tối đa
+    private List<Integer> idxTemp = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,6 +74,84 @@ public class GhepKiHieuActivity extends AppCompatActivity {
         adapter = new KiHieuAdapter(this, Common.kiHieuList);
         binding.recyclerView.setAdapter(adapter);
         binding.titile.setText(Common.entity.getName());
+    }
+
+    private void showDialogNote() {
+        // Sử dụng LayoutInflater để nạp layout dialog_input_time.xml
+        LayoutInflater inflater = LayoutInflater.from(this);
+        View dialogView = inflater.inflate(R.layout.dialog_input_time, null);
+
+        // Khai báo EditText từ dialog layout
+        EditText editTextTime = dialogView.findViewById(R.id.editTextTime);
+        editTextTime.setInputType(InputType.TYPE_CLASS_TEXT);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setView(dialogView) // Đặt view cho dialog
+                .setTitle("Nhập nội dung note: ")
+                .setPositiveButton("OK", (dialog, which) -> {
+                    // Xử lý khi người dùng nhấn "OK"
+                    String noteInput = editTextTime.getText().toString();
+                    if (!noteInput.isEmpty()) {
+                        // Tạo một TextView mới
+                        TextView textView = new TextView(GhepKiHieuActivity.this);
+                        textView.setText(noteInput);
+                        textView.setTextSize(20);
+                        textView.setTextColor(Color.BLACK);
+
+                        // Đặt LayoutParams cho TextView
+                        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
+                                FrameLayout.LayoutParams.WRAP_CONTENT,
+                                FrameLayout.LayoutParams.WRAP_CONTENT
+                        );
+                        params.gravity = Gravity.CENTER; // Đặt vị trí của TextView trong FrameLayout
+
+                        // Kiểm tra nếu TextView đã có parent, nếu có thì loại bỏ nó khỏi parent
+                        if (textView.getParent() != null) {
+                            ((ViewGroup) textView.getParent()).removeView(textView);
+                        }
+
+                        // Thêm TextView vào FrameLayout
+                        binding.frameLayout.addView(textView, params);
+
+                        setTouchTextView(textView); // Nếu bạn cần touch listener cho hình ảnh, hãy bật lại dòng này
+                    }
+                })
+                .setNegativeButton("Huỷ", (dialog, which) -> dialog.dismiss());
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
+    TextView currentTextView;
+
+    @SuppressLint("ClickableViewAccessibility")
+    private void setTouchTextView(TextView textView) {
+        textView.setOnTouchListener(new View.OnTouchListener() {
+            private float lastTouchX;
+            private float lastTouchY;
+            private float dX, dY;
+
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        currentTextView = textView;
+                        lastTouchX = event.getRawX();
+                        lastTouchY = event.getRawY();
+                        dX = v.getX() - lastTouchX;
+                        dY = v.getY() - lastTouchY;
+                        break;
+
+                    case MotionEvent.ACTION_MOVE:
+                        float newX = event.getRawX() + dX;
+                        float newY = event.getRawY() + dY;
+                        v.setX(newX);
+                        v.setY(newY);
+                        break;
+                }
+                return true;
+            }
+        });
     }
 
     private void showImageInfoDialog(String title, String imageUrl, String info) {
@@ -104,6 +187,12 @@ public class GhepKiHieuActivity extends AppCompatActivity {
 
     @SuppressLint("ClickableViewAccessibility")
     void onClick() {
+        binding.btnNote.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showDialogNote();
+            }
+        });
         binding.btnZoomIn.setOnClickListener(v -> {
             scaleFactor += 0.1f;
             scaleFactor = Math.min(scaleFactor, maxScaleFactor); // Giới hạn tỷ lệ zoom in tối đa
@@ -152,7 +241,7 @@ public class GhepKiHieuActivity extends AppCompatActivity {
                         binding.frameLayout.addView(imageView);
                         setTouchListener(imageView);
                         imageViewList.add(imageView);
-
+                        idxTemp.add(chooseIdx);
                         return true;
                     case DragEvent.ACTION_DRAG_ENDED:
                         return true;
@@ -224,6 +313,8 @@ public class GhepKiHieuActivity extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 binding.frameLayout.removeView(imageViewList.get(currentIndex));
+                imageViewList.remove(currentIndex);
+                idxTemp.remove(currentIndex);
                 dialog.dismiss();
             }
         });
@@ -316,7 +407,7 @@ public class GhepKiHieuActivity extends AppCompatActivity {
                         lastClickTime = currentTime;
                         // Kiểm tra nếu là double click
                         if (clickCount == 2) {
-                            int idx = imageViewList.indexOf(currentImageView);
+                            int idx = idxTemp.get(imageViewList.indexOf(currentImageView));
                             showDialogArea(idx);
                             clickCount = 0; // Reset sau khi phát hiện double click
                         }
