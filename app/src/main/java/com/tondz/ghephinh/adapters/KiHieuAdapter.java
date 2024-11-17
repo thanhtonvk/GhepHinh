@@ -1,5 +1,6 @@
 package com.tondz.ghephinh.adapters;
 
+import android.annotation.SuppressLint;
 import android.content.ClipData;
 import android.content.ClipDescription;
 import android.content.Context;
@@ -15,13 +16,15 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.squareup.picasso.Picasso;
 import com.tondz.ghephinh.R;
+import com.tondz.ghephinh.models.Entity;
 import com.tondz.ghephinh.models.KiHieu;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class KiHieuAdapter extends RecyclerView.Adapter<KiHieuAdapter.ViewHolder> {
     Context context;
-    List<KiHieu> kiHieuList;
+    public List<KiHieu> kiHieuList;
 
     public KiHieuAdapter(Context context, List<KiHieu> kiHieuList) {
         this.context = context;
@@ -39,6 +42,7 @@ public class KiHieuAdapter extends RecyclerView.Adapter<KiHieuAdapter.ViewHolder
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         KiHieu kiHieu = kiHieuList.get(position);
         Picasso.get().load(kiHieu.getSingle_image_url()).into(holder.imgView);
+        holder.tvName.setText(kiHieu.getName());
         holder.imgView.setOnLongClickListener(v -> {
             ClipData.Item item = new ClipData.Item(position + "");
             ClipData dragData = new ClipData(position + "", new String[]{ClipDescription.MIMETYPE_TEXT_PLAIN}, item);
@@ -50,17 +54,25 @@ public class KiHieuAdapter extends RecyclerView.Adapter<KiHieuAdapter.ViewHolder
         });
     }
 
+    public void updateData(List<KiHieu> newKiHieuList) {
+        kiHieuList.clear();
+        kiHieuList.addAll(newKiHieuList);
+        notifyDataSetChanged();
+    }
+
     @Override
     public int getItemCount() {
         return kiHieuList.size();
     }
 
+
     class ViewHolder extends RecyclerView.ViewHolder {
         ImageView imgView;
+        TextView tvName;
 
         public ViewHolder(View itemView) {
             super(itemView);
-
+            tvName = itemView.findViewById(R.id.tvName);
             imgView = itemView.findViewById(R.id.imgView);
         }
     }

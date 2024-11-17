@@ -14,9 +14,8 @@
         android:text="Lựa chọn kí hiệu"
         android:textColor="@color/white" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/kiHieuRecyclerView"
+    <ListView
+        android:id="@+id/listView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+        android:layout_height="200dp" />
 </LinearLayout>

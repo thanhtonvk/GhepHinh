@@ -15,7 +15,7 @@ public class Common {
     public static String idQuocGia, idKhuVuc, idTinh, idHuyen, idXa;
     public static List<Entity> entityList;
     public static Entity entity;
-    public static List<KiHieu> kiHieuList;
+    public static List<KiHieu> kiHieuList = new ArrayList<>();
     public static Set<String> loaiKiHieuList;
     public static KiHieu kiHieu;
     public static CauHoi CAU_HOI;

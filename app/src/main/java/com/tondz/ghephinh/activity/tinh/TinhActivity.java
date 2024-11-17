@@ -5,9 +5,12 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SearchView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.database.DataSnapshot;
@@ -17,6 +20,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.tondz.ghephinh.R;
 import com.tondz.ghephinh.activity.GhepHinhActivity;
+import com.tondz.ghephinh.activity.GhepKiHieuActivity;
 import com.tondz.ghephinh.adapters.KiHieuTextAdapter;
 import com.tondz.ghephinh.databinding.ActivityTinhBinding;
 import com.tondz.ghephinh.models.CauHoi;
@@ -96,7 +100,7 @@ public class TinhActivity extends AppCompatActivity {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         Common.entity = snapshot.getValue(Entity.class);
-                        dialogKiHieu();
+                        startActivity(new Intent(getApplicationContext(), GhepKiHieuActivity.class));
                     }
 
                     @Override
@@ -107,17 +111,27 @@ public class TinhActivity extends AppCompatActivity {
 
             }
         });
+        binding.searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                adapter.filter(newText);
+                return false;
+            }
+        });
     }
 
     private void dialogKiHieu() {
         Dialog dialog = new Dialog(this);
         dialog.setContentView(R.layout.dialog_ki_hieu);
-        KiHieuTextAdapter kiHieuTextAdapter = new KiHieuTextAdapter(dialog.getContext(), Common.loaiKiHieuList);
-        RecyclerView recyclerView = dialog.findViewById(R.id.kiHieuRecyclerView);
-        recyclerView.setAdapter(kiHieuTextAdapter);
+        ListView listView = dialog.findViewById(R.id.listView);
+        ArrayAdapter adapter = new ArrayAdapter(getApplicationContext(), android.R.layout.simple_list_item_1, Common.loaiKiHieuList.toArray());
+        listView.setAdapter(adapter);
         dialog.show();
-
-
     }
 
     private void init() {
@@ -146,6 +160,7 @@ public class TinhActivity extends AppCompatActivity {
                     }
                 }
                 adapter.notifyDataSetChanged();
+                adapter.filter("");
             }
 
             @Override

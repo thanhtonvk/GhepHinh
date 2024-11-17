@@ -14,7 +14,7 @@
         android:background="#1565C0"
         android:gravity="center"
         android:padding="10dp"
-        android:text="Chọn thế giới"
+        android:text="THẾ GIỚI HOẶC VIỆT NAM"
         android:textColor="@color/white" />
 
     <androidx.recyclerview.widget.RecyclerView

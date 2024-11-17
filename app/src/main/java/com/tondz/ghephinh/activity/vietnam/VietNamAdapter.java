@@ -18,15 +18,18 @@ import com.tondz.ghephinh.activity.huyen.HuyenActivity;
 import com.tondz.ghephinh.models.Entity;
 import com.tondz.ghephinh.utils.Common;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class VietNamAdapter extends RecyclerView.Adapter<VietNamAdapter.ViewHolder> {
     Context context;
     List<Entity> entityList;
+    private List<Entity> filteredList;
 
     public VietNamAdapter(Context context, List<Entity> entityList) {
         this.context = context;
         this.entityList = entityList;
+        this.filteredList = new ArrayList<>(entityList);
     }
 
 
@@ -39,16 +42,31 @@ public class VietNamAdapter extends RecyclerView.Adapter<VietNamAdapter.ViewHold
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, @SuppressLint("RecyclerView") int position) {
-        Entity entity = entityList.get(position);
+        Entity entity = filteredList.get(position);
         holder.tvName.setText(entity.getName());
         if (!entity.getSingle_image_url().isEmpty()) {
             Picasso.get().load(entity.getSingle_image_url()).into(holder.imgView);
         }
     }
 
+    @SuppressLint("NotifyDataSetChanged")
+    public void filter(String query) {
+        filteredList.clear();
+        if (!query.isEmpty()) {
+            for (Entity item : entityList) {
+                if (item.getName().toLowerCase().contains(query.toLowerCase())) {
+                    filteredList.add(item);
+                }
+            }
+        } else {
+            filteredList.addAll(entityList);
+        }
+        notifyDataSetChanged(); // Cập nhật giao diện
+    }
+
     @Override
     public int getItemCount() {
-        return entityList.size();
+        return filteredList.size();
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {

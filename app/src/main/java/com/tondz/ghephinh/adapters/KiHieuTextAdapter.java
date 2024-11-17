@@ -1,12 +1,15 @@
 package com.tondz.ghephinh.adapters;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -18,6 +21,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.tondz.ghephinh.R;
 import com.tondz.ghephinh.activity.GhepKiHieuActivity;
+
 import com.tondz.ghephinh.models.KiHieu;
 import com.tondz.ghephinh.utils.Common;
 
@@ -27,6 +31,7 @@ import java.util.List;
 import java.util.Set;
 
 public class KiHieuTextAdapter extends RecyclerView.Adapter<KiHieuTextAdapter.ViewHolder> {
+
     Context context;
     Set<String> kiHieuList;
     FirebaseDatabase database;
@@ -54,6 +59,7 @@ public class KiHieuTextAdapter extends RecyclerView.Adapter<KiHieuTextAdapter.Vi
             @Override
             public void onClick(View view) {
                 reference.child("KiHieu").addValueEventListener(new ValueEventListener() {
+                    @SuppressLint("NotifyDataSetChanged")
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         Common.kiHieuList = new ArrayList<>();
@@ -64,7 +70,7 @@ public class KiHieuTextAdapter extends RecyclerView.Adapter<KiHieuTextAdapter.Vi
                                 Common.kiHieuList.add(kiHieu);
                             }
                         }
-                        context.startActivity(new Intent(context, GhepKiHieuActivity.class));
+
                     }
 
                     @Override

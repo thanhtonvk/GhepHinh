@@ -8,6 +8,7 @@ import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SearchView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.database.DataSnapshot;
@@ -17,6 +18,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.tondz.ghephinh.R;
 import com.tondz.ghephinh.activity.GhepHinhActivity;
+import com.tondz.ghephinh.activity.GhepKiHieuActivity;
 import com.tondz.ghephinh.adapters.KiHieuTextAdapter;
 import com.tondz.ghephinh.databinding.ActivityVietNamBinding;
 import com.tondz.ghephinh.models.CauHoi;
@@ -96,7 +98,7 @@ public class VietNamActivity extends AppCompatActivity {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         Common.entity = snapshot.getValue(Entity.class);
-                        dialogKiHieu();
+                        startActivity(new Intent(getApplicationContext(), GhepKiHieuActivity.class));
                     }
 
                     @Override
@@ -107,18 +109,21 @@ public class VietNamActivity extends AppCompatActivity {
 
             }
         });
+        binding.searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                adapter.filter(newText);
+                return false;
+            }
+        });
     }
 
-    private void dialogKiHieu() {
-        Dialog dialog = new Dialog(this);
-        dialog.setContentView(R.layout.dialog_ki_hieu);
-        KiHieuTextAdapter kiHieuTextAdapter = new KiHieuTextAdapter(dialog.getContext(), Common.loaiKiHieuList);
-        RecyclerView recyclerView = dialog.findViewById(R.id.kiHieuRecyclerView);
-        recyclerView.setAdapter(kiHieuTextAdapter);
-        dialog.show();
 
-
-    }
 
     private void init() {
         database = FirebaseDatabase.getInstance();
@@ -146,6 +151,7 @@ public class VietNamActivity extends AppCompatActivity {
                     }
                 }
                 adapter.notifyDataSetChanged();
+                adapter.filter("");
             }
 
             @Override

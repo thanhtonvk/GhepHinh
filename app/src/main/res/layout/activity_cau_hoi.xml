@@ -62,8 +62,9 @@
                 android:paddingStart="16dp"
                 android:paddingTop="10dp"
                 android:paddingEnd="12dp"
+                android:backgroundTint="#5C6BC0"
                 android:paddingBottom="8dp"
-                android:text="Cần cù bù..."
+                android:text="Việt nam có bao nhiêu tỉnh thành"
                 android:textColor="@color/white"
                 android:textSize="15sp" />
 
@@ -91,8 +92,8 @@
                     android:layout_margin="10dp"
                     android:layout_weight="1"
                     android:background="@drawable/bubble"
-                    android:backgroundTint="#42A5F5"
-                    android:text="Siêng năng"
+                    android:backgroundTint="#FF7043"
+                    android:text="63"
                     android:textColor="@color/white" />
 
                 <androidx.appcompat.widget.AppCompatButton
@@ -102,7 +103,8 @@
                     android:layout_margin="10dp"
                     android:layout_weight="1"
                     android:background="@drawable/bubble"
-                    android:text="Đầu gối"
+                    android:backgroundTint="#66BB6A"
+                    android:text="64"
                     android:textColor="@color/white" />
             </LinearLayout>
 
@@ -120,7 +122,8 @@
                     android:layout_margin="10dp"
                     android:layout_weight="1"
                     android:background="@drawable/bubble"
-                    android:text="Thông minh"
+                    android:text="65"
+                    android:backgroundTint="#FFCA28"
                     android:textColor="@color/white" />
 
                 <androidx.appcompat.widget.AppCompatButton
@@ -129,8 +132,9 @@
                     android:layout_height="match_parent"
                     android:layout_margin="10dp"
                     android:layout_weight="1"
+                    android:backgroundTint="#EF5350"
                     android:background="@drawable/bubble"
-                    android:text="Hỏi thầy huấn"
+                    android:text="5"
                     android:textColor="@color/white" />
             </LinearLayout>
         </LinearLayout>

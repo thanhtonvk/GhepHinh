@@ -1,5 +1,6 @@
 package com.tondz.ghephinh.adapters;
 
+import android.annotation.SuppressLint;
 import android.content.ClipData;
 import android.content.ClipDescription;
 import android.content.Context;
@@ -17,15 +18,18 @@ import com.squareup.picasso.Picasso;
 import com.tondz.ghephinh.R;
 import com.tondz.ghephinh.models.Entity;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> {
     Context context;
     List<Entity> entityList;
+    private List<Entity> filteredList;
 
     public ImageAdapter(Context context, List<Entity> entityList) {
         this.context = context;
         this.entityList = entityList;
+        this.filteredList = new ArrayList<>(entityList);
     }
 
 
@@ -38,32 +42,49 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        Entity entity = entityList.get(position);
+        Entity entity = filteredList.get(position);
+        holder.tvName.setText(entity.getName());
         if (!entity.getSingle_image_url().isEmpty()) {
             Picasso.get().load(entity.getSingle_image_url()).into(holder.imgView);
         }
         holder.imgView.setOnLongClickListener(v -> {
             ClipData.Item item = new ClipData.Item(position + "");
             ClipData dragData = new ClipData(position + "", new String[]{ClipDescription.MIMETYPE_TEXT_PLAIN}, item);
-            Log.e("TAG", "onBindViewHolder: "+entity.getName() );
+            Log.e("TAG", "onBindViewHolder: " + entity.getName());
             View.DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(holder.imgView);
             v.startDragAndDrop(dragData, shadowBuilder, null, 0);
             return true;
         });
     }
 
+    @SuppressLint("NotifyDataSetChanged")
+    public void filter(String query) {
+        filteredList.clear();
+        if (!query.isEmpty()) {
+            for (Entity item : entityList) {
+                if (item.getName().toLowerCase().contains(query.toLowerCase())) {
+                    filteredList.add(item);
+                }
+            }
+        } else {
+            filteredList.addAll(entityList);
+        }
+        notifyDataSetChanged(); // Cập nhật giao diện
+    }
+
     @Override
     public int getItemCount() {
-        return entityList.size();
+        return filteredList.size();
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {
 
         ImageView imgView;
+        TextView tvName;
 
         public ViewHolder(View itemView) {
             super(itemView);
-
+            tvName = itemView.findViewById(R.id.tvName);
             imgView = itemView.findViewById(R.id.imgView);
         }
     }

@@ -63,6 +63,7 @@ public class TheGioiActivity extends AppCompatActivity {
                 }
                 loadVietNam();
                 adapter.notifyDataSetChanged();
+
             }
 
             @Override
@@ -77,8 +78,9 @@ public class TheGioiActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 Entity entity = snapshot.getValue(Entity.class);
+                entity.setSingle_image_url("https://firebasestorage.googleapis.com/v0/b/baucucanbo.appspot.com/o/z6037342593973_4ec952788714dae8137f0b953d8ba898.gif?alt=media&token=dab222d9-2992-48ed-bebc-8dab1fca915e");
                 entityList.add(entity);
-                Log.e("TAG", "onDataChange: "+snapshot );
+                Log.e("TAG", "onDataChange: " + snapshot);
                 adapter.notifyDataSetChanged();
             }
 

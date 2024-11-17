@@ -16,7 +16,12 @@
         android:padding="10dp"
         android:text="Chọn huyện"
         android:textColor="@color/white" />
-
+    <androidx.appcompat.widget.SearchView
+        android:id="@+id/searchView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:iconifiedByDefault="false"
+        android:queryHint="Tìm kiếm..." />
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -50,7 +55,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:background="#F9A825"
-                android:text="Ghép kí hiểu"
+                android:text="Ghép kí hiệu"
                 android:textColor="@color/white" />
         </LinearLayout>
 

@@ -18,15 +18,18 @@ import com.tondz.ghephinh.R;
 import com.tondz.ghephinh.models.Entity;
 import com.tondz.ghephinh.utils.Common;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class XaAdapter extends RecyclerView.Adapter<XaAdapter.ViewHolder> {
     Context context;
     List<Entity> entityList;
+    private List<Entity> filteredList;
 
     public XaAdapter(Context context, List<Entity> entityList) {
         this.context = context;
         this.entityList = entityList;
+        this.filteredList = new ArrayList<>(entityList);
     }
 
 
@@ -46,9 +49,25 @@ public class XaAdapter extends RecyclerView.Adapter<XaAdapter.ViewHolder> {
         }
     }
 
+
+    @SuppressLint("NotifyDataSetChanged")
+    public void filter(String query) {
+        filteredList.clear();
+        if (!query.isEmpty()) {
+            for (Entity item : entityList) {
+                if (item.getName().toLowerCase().contains(query.toLowerCase())) {
+                    filteredList.add(item);
+                }
+            }
+        } else {
+            filteredList.addAll(entityList);
+        }
+        notifyDataSetChanged(); // Cập nhật giao diện
+    }
+
     @Override
     public int getItemCount() {
-        return entityList.size();
+        return filteredList.size();
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {

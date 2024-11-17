@@ -4,10 +4,13 @@ import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SearchView;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -20,6 +23,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.tondz.ghephinh.R;
 import com.tondz.ghephinh.activity.GhepHinhActivity;
+import com.tondz.ghephinh.activity.GhepKiHieuActivity;
 import com.tondz.ghephinh.adapters.AreaAdapter;
 import com.tondz.ghephinh.adapters.KiHieuTextAdapter;
 import com.tondz.ghephinh.databinding.ActivityChauLucBinding;
@@ -102,7 +106,7 @@ public class ChauLucActivity extends AppCompatActivity {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         Common.entity = snapshot.getValue(Entity.class);
-                        dialogKiHieu();
+                        startActivity(new Intent(getApplicationContext(), GhepKiHieuActivity.class));
                     }
 
                     @Override
@@ -113,18 +117,20 @@ public class ChauLucActivity extends AppCompatActivity {
 
             }
         });
+        binding.searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                adapter.filter(newText);
+                return false;
+            }
+        });
     }
 
-    private void dialogKiHieu() {
-        Dialog dialog = new Dialog(this);
-        dialog.setContentView(R.layout.dialog_ki_hieu);
-        KiHieuTextAdapter kiHieuTextAdapter = new KiHieuTextAdapter(dialog.getContext(), Common.loaiKiHieuList);
-        RecyclerView recyclerView = dialog.findViewById(R.id.kiHieuRecyclerView);
-        recyclerView.setAdapter(kiHieuTextAdapter);
-        dialog.show();
-
-
-    }
 
     private void init() {
         database = FirebaseDatabase.getInstance();
@@ -152,6 +158,7 @@ public class ChauLucActivity extends AppCompatActivity {
                     }
                 }
                 adapter.notifyDataSetChanged();
+                adapter.filter("");
             }
 
             @Override

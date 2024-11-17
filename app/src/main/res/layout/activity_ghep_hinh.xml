@@ -35,6 +35,17 @@
         android:background="#00FFFFFF"
         android:src="@drawable/baseline_zoom_out_24" />
 
+
+    <androidx.appcompat.widget.SearchView
+
+        android:id="@+id/searchView"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:layout_above="@id/btnNote"
+        android:layout_alignParentRight="true"
+        android:iconifiedByDefault="false"
+        android:queryHint="Tìm kiếm..." />
+
     <ImageView
         android:id="@+id/btnNote"
         android:layout_width="40dp"
@@ -49,7 +60,7 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"
-        android:layout_height="75dp"
+        android:layout_height="100dp"
         android:layout_alignParentBottom="true"
         android:orientation="horizontal"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />

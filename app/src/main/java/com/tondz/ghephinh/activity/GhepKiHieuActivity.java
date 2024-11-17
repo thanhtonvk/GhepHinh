@@ -1,11 +1,9 @@
 package com.tondz.ghephinh.activity;
 
 
-import static com.tondz.ghephinh.utils.Common.entityList;
-import static com.tondz.ghephinh.utils.Common.kiHieuList;
-
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.ClipData;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -21,20 +19,32 @@ import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 import com.tondz.ghephinh.R;
 import com.tondz.ghephinh.adapters.KiHieuAdapter;
+import com.tondz.ghephinh.adapters.KiHieuTextAdapter;
 import com.tondz.ghephinh.databinding.ActivityGhepKiHieuBinding;
 import com.tondz.ghephinh.models.Entity;
 import com.tondz.ghephinh.models.KiHieu;
@@ -44,7 +54,10 @@ import org.imaginativeworld.whynotimagecarousel.ImageCarousel;
 import org.imaginativeworld.whynotimagecarousel.model.CarouselItem;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+
 
 public class GhepKiHieuActivity extends AppCompatActivity {
     ActivityGhepKiHieuBinding binding;
@@ -54,11 +67,14 @@ public class GhepKiHieuActivity extends AppCompatActivity {
     private float lastTouchX, lastTouchY;
     private List<ImageView> imageViewList = new ArrayList<>();
     int currentIndex = -1;
-    KiHieuAdapter adapter;
     private float scaleFactor = 1.0f;
-    private float minScaleFactor = 1.0f;  // Tỷ lệ zoom out tối thiểu (kích thước ban đầu)
-    private float maxScaleFactor = 10.0f;  // Tỷ lệ zoom in tối đa
+    private float minScaleFactor = 1.0f;
+    private float maxScaleFactor = 10.0f;
     private List<Integer> idxTemp = new ArrayList<>();
+
+    private KiHieuAdapter kiHieuAdapter;
+    FirebaseDatabase database;
+    DatabaseReference reference;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,9 +87,48 @@ public class GhepKiHieuActivity extends AppCompatActivity {
     }
 
     private void init() {
-        adapter = new KiHieuAdapter(this, Common.kiHieuList);
-        binding.recyclerView.setAdapter(adapter);
+        kiHieuAdapter = new KiHieuAdapter(this, Common.kiHieuList);
+        binding.recyclerView.setAdapter(kiHieuAdapter);
         binding.titile.setText(Common.entity.getName());
+        database = FirebaseDatabase.getInstance();
+        reference = database.getReference();
+    }
+
+    private void dialogKiHieu() {
+        Dialog dialog = new Dialog(this);
+        dialog.setContentView(R.layout.dialog_ki_hieu);
+        ListView listView = dialog.findViewById(R.id.listView);
+        ArrayAdapter adapter = new ArrayAdapter(getApplicationContext(), android.R.layout.simple_list_item_1, Common.loaiKiHieuList.toArray());
+        listView.setAdapter(adapter);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                dialog.dismiss();
+                String loaiKiHieu = Common.loaiKiHieuList.toArray()[position].toString();
+                reference.child("KiHieu").addValueEventListener(new ValueEventListener() {
+                    @SuppressLint("NotifyDataSetChanged")
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        Common.kiHieuList.clear();
+                        for (DataSnapshot dataSnapshot :
+                                snapshot.getChildren()) {
+                            KiHieu kiHieu = dataSnapshot.getValue(KiHieu.class);
+                            if (kiHieu.getGroup().equals(loaiKiHieu)) {
+                                Common.kiHieuList.add(kiHieu);
+                            }
+                        }
+                        kiHieuAdapter.notifyDataSetChanged();
+
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
+            }
+        });
+        dialog.show();
     }
 
     private void showDialogNote() {
@@ -187,6 +242,12 @@ public class GhepKiHieuActivity extends AppCompatActivity {
 
     @SuppressLint("ClickableViewAccessibility")
     void onClick() {
+        binding.btnMenu.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialogKiHieu();
+            }
+        });
         binding.btnNote.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -294,11 +355,11 @@ public class GhepKiHieuActivity extends AppCompatActivity {
     }
 
     private void showDialogArea(int idx) {
-        KiHieu entity = kiHieuList.get(idx);
+        KiHieu entity = Common.kiHieuList.get(idx);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(GhepKiHieuActivity.this);
-        builder.setTitle(kiHieuList.get(idx).getName());
-        builder.setMessage(kiHieuList.get(idx).getInfo());
+        builder.setTitle(Common.kiHieuList.get(idx).getName());
+        builder.setMessage(Common.kiHieuList.get(idx).getInfo());
 
         // Các tùy chọn khác cho dialog
         builder.setPositiveButton("Xem chi tiết", new DialogInterface.OnClickListener() {
