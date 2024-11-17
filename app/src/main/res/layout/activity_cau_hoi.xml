@@ -84,17 +84,18 @@
                 android:orientation="horizontal"
                 android:weightSum="2">
 
-                <Button
+                <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/btn_da1"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_margin="10dp"
                     android:layout_weight="1"
                     android:background="@drawable/bubble"
+                    android:backgroundTint="#42A5F5"
                     android:text="Siêng năng"
                     android:textColor="@color/white" />
 
-                <Button
+                <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/btn_da2"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
@@ -112,7 +113,7 @@
                 android:orientation="horizontal"
                 android:weightSum="2">
 
-                <Button
+                <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/btn_da3"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
@@ -122,7 +123,7 @@
                     android:text="Thông minh"
                     android:textColor="@color/white" />
 
-                <Button
+                <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/btn_da4"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"

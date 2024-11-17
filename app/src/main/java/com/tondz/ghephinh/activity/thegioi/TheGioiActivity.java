@@ -1,6 +1,7 @@
 package com.tondz.ghephinh.activity.thegioi;
 
 import android.os.Bundle;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -12,7 +13,9 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.tondz.ghephinh.adapters.AreaAdapter;
 import com.tondz.ghephinh.databinding.ActivityTheGioiBinding;
+import com.tondz.ghephinh.models.CauHoi;
 import com.tondz.ghephinh.models.Entity;
+import com.tondz.ghephinh.utils.Common;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,10 +48,18 @@ public class TheGioiActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 entityList.clear();
+                Common.cauHoiArrayList = new ArrayList<>();
                 for (DataSnapshot dataSnapshot :
                         snapshot.getChildren()) {
-                    Entity entity = dataSnapshot.getValue(Entity.class);
-                    entityList.add(entity);
+                    if (dataSnapshot.getKey().equalsIgnoreCase("CauHoi")) {
+                        for (DataSnapshot snapShotCauHoi : dataSnapshot.getChildren()
+                        ) {
+                            Common.cauHoiArrayList.add(snapShotCauHoi.getValue(CauHoi.class));
+                        }
+                    } else {
+                        Entity entity = dataSnapshot.getValue(Entity.class);
+                        entityList.add(entity);
+                    }
                 }
                 loadVietNam();
                 adapter.notifyDataSetChanged();
@@ -67,6 +78,8 @@ public class TheGioiActivity extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 Entity entity = snapshot.getValue(Entity.class);
                 entityList.add(entity);
+                Log.e("TAG", "onDataChange: "+snapshot );
+                adapter.notifyDataSetChanged();
             }
 
             @Override

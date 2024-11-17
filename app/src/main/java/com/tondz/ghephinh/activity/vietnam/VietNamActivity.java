@@ -19,6 +19,7 @@ import com.tondz.ghephinh.R;
 import com.tondz.ghephinh.activity.GhepHinhActivity;
 import com.tondz.ghephinh.adapters.KiHieuTextAdapter;
 import com.tondz.ghephinh.databinding.ActivityVietNamBinding;
+import com.tondz.ghephinh.models.CauHoi;
 import com.tondz.ghephinh.models.Entity;
 import com.tondz.ghephinh.utils.Common;
 
@@ -50,12 +51,20 @@ public class VietNamActivity extends AppCompatActivity {
                 reference.child("Vietnam").addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        Log.e("TAG", "dataget " + snapshot.toString());
                         Common.entityList = new ArrayList<>();
+                        Common.cauHoiArrayList = new ArrayList<>();
                         for (DataSnapshot dataSnapshot :
                                 snapshot.getChildren()) {
-                            Entity entity = dataSnapshot.getValue(Entity.class);
-                            Common.entityList.add(entity);
+                            if (dataSnapshot.getKey().equalsIgnoreCase("CauHoi")) {
+                                for (DataSnapshot cauHoiSnapshot : dataSnapshot.getChildren()
+                                ) {
+                                    Common.cauHoiArrayList.add(cauHoiSnapshot.getValue(CauHoi.class));
+                                }
+                            } else {
+                                Entity entity = dataSnapshot.getValue(Entity.class);
+                                Common.entityList.add(entity);
+                            }
+
                         }
                         reference.child("QuocGia").child("0").child("41").addValueEventListener(new ValueEventListener() {
                             @Override
@@ -123,10 +132,18 @@ public class VietNamActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 entityList.clear();
+                Common.cauHoiArrayList = new ArrayList<>();
                 for (DataSnapshot dataSnapshot :
                         snapshot.getChildren()) {
-                    Entity entity = dataSnapshot.getValue(Entity.class);
-                    entityList.add(entity);
+                    if (dataSnapshot.getKey().equalsIgnoreCase("CauHoi")) {
+                        for (DataSnapshot snapShotCauHoi : dataSnapshot.getChildren()
+                        ) {
+                            Common.cauHoiArrayList.add(snapShotCauHoi.getValue(CauHoi.class));
+                        }
+                    } else {
+                        Entity entity = dataSnapshot.getValue(Entity.class);
+                        entityList.add(entity);
+                    }
                 }
                 adapter.notifyDataSetChanged();
             }

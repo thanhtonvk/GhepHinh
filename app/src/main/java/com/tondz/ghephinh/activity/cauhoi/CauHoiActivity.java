@@ -1,5 +1,7 @@
 package com.tondz.ghephinh.activity.cauhoi;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.Bundle;
@@ -33,7 +35,7 @@ public class CauHoiActivity extends AppCompatActivity {
     MediaPlayer wrongSound;
     MediaPlayer correctSound;
     int idxCauHoi = -1;
-    int diem = 0;
+    float diem = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,19 +49,44 @@ public class CauHoiActivity extends AppCompatActivity {
         wrongSound = MediaPlayer.create(this, R.raw.wrong_sound);
         correctSound = MediaPlayer.create(this, R.raw.correct_sound);
         tv_cauhoi.setAnimation(dsHieuUng.get(random.nextInt(3)));
-        loadCauHoi();
+//        loadCauHoi();
         nextCauHoi();
         onClick();
     }
 
-    private void loadCauHoi() {
-        Common.cauHoiArrayList = new ArrayList<>();
-        Common.cauHoiArrayList.add(new CauHoi("1", "1", "1", "1", "1", "1", "1"));
+    private void showAlertDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Chúc mừng bạn đã hoàn thành các câu hỏi");
+        builder.setMessage("Điểm: " + (int) diem);
+
+        // Add Yes button
+        builder.setPositiveButton("Thoát", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss(); // Close the dialog
+                finish();
+            }
+        });
+
+        // Add No button
+        builder.setNegativeButton("Làm lại", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                diem = 0;
+                idxCauHoi = -1;
+                nextCauHoi();
+            }
+        });
+
+        // Create and show the AlertDialog
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
     }
 
     private void nextCauHoi() {
+        tv_solanxoan.setText("Điểm : " + (int) diem);
         if (idxCauHoi == Common.cauHoiArrayList.size() - 1) {
-            Toast.makeText(this, "Hết câu hỏi", Toast.LENGTH_SHORT).show();
+            showAlertDialog();
             return;
         } else {
             idxCauHoi += 1;
@@ -70,6 +97,7 @@ public class CauHoiActivity extends AppCompatActivity {
             btn_da3.setText(Common.CAU_HOI.getC());
             btn_da4.setText(Common.CAU_HOI.getD());
         }
+
 
     }
 
@@ -85,6 +113,7 @@ public class CauHoiActivity extends AppCompatActivity {
             public void onClick(View view) {
                 if (checkDapAn(btn_da1.getText().toString(), Common.CAU_HOI)) {
                     correctSound.start();
+                    diem += (float) 10 / Common.cauHoiArrayList.size();
                 } else {
                     wrongSound.start();
                 }
@@ -96,6 +125,7 @@ public class CauHoiActivity extends AppCompatActivity {
             public void onClick(View view) {
                 if (checkDapAn(btn_da2.getText().toString(), Common.CAU_HOI)) {
                     correctSound.start();
+                    diem += (float) 10 / Common.cauHoiArrayList.size();
                 } else {
 
                     wrongSound.start();
@@ -108,7 +138,7 @@ public class CauHoiActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if (checkDapAn(btn_da3.getText().toString(), Common.CAU_HOI)) {
-
+                    diem += (float) 10 / Common.cauHoiArrayList.size();
                     correctSound.start();
 
                 } else {
@@ -123,7 +153,7 @@ public class CauHoiActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if (checkDapAn(btn_da4.getText().toString(), Common.CAU_HOI)) {
-
+                    diem += (float) 10 / Common.cauHoiArrayList.size();
                     correctSound.start();
 
                 } else {
