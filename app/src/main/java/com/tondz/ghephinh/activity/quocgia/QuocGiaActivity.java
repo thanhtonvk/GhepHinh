@@ -26,10 +26,12 @@ import com.tondz.ghephinh.databinding.ActivityChauLucBinding;
 import com.tondz.ghephinh.databinding.ActivityQuocGiaBinding;
 import com.tondz.ghephinh.models.CauHoi;
 import com.tondz.ghephinh.models.Entity;
+import com.tondz.ghephinh.models.HinhNen;
 import com.tondz.ghephinh.utils.Common;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class QuocGiaActivity extends AppCompatActivity {
 
@@ -63,7 +65,9 @@ public class QuocGiaActivity extends AppCompatActivity {
                             if (dataSnapshot.getKey().equalsIgnoreCase("CauHoi")) {
                                 for (DataSnapshot cauHoiSnapshot : dataSnapshot.getChildren()
                                 ) {
-                                    Common.cauHoiArrayList.add(cauHoiSnapshot.getValue(CauHoi.class));
+                                    Map<String, Object> map = (Map<String, Object>) cauHoiSnapshot.getValue();
+                                    CauHoi cauHoi = new CauHoi(map.get("id").toString(), map.get("cauhoi").toString(), map.get("a").toString(), map.get("b").toString(), map.get("c").toString(), map.get("d").toString(), map.get("dapan").toString());
+                                    Common.cauHoiArrayList.add(cauHoi);
                                 }
                             } else {
                                 Entity entity = dataSnapshot.getValue(Entity.class);
@@ -147,14 +151,24 @@ public class QuocGiaActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 entityList.clear();
+                Common.hinhGhepList.clear();
                 Common.cauHoiArrayList = new ArrayList<>();
                 for (DataSnapshot dataSnapshot :
                         snapshot.getChildren()) {
                     if (dataSnapshot.getKey().equalsIgnoreCase("CauHoi")) {
+                        for (DataSnapshot cauHoiSnapshot : dataSnapshot.getChildren()
+                        ) {
+                            Map<String, Object> map = (Map<String, Object>) cauHoiSnapshot.getValue();
+                            CauHoi cauHoi = new CauHoi(map.get("id").toString(), map.get("cauhoi").toString(), map.get("a").toString(), map.get("b").toString(), map.get("c").toString(), map.get("d").toString(), map.get("dapan").toString());
+                            Common.cauHoiArrayList.add(cauHoi);
+                        }
+                    } else if (dataSnapshot.getKey().equalsIgnoreCase("HinhNen")) {
+
                         for (DataSnapshot snapShotCauHoi : dataSnapshot.getChildren()
                         ) {
-                            Common.cauHoiArrayList.add(snapShotCauHoi.getValue(CauHoi.class));
+                            Common.hinhGhepList.add(snapShotCauHoi.getValue(HinhNen.class));
                         }
+
                     } else {
                         Entity entity = dataSnapshot.getValue(Entity.class);
                         entityList.add(entity);

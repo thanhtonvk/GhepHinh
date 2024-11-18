@@ -2,6 +2,7 @@ package com.tondz.ghephinh.activity;
 
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.ClipData;
@@ -9,8 +10,10 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.text.InputType;
 import android.view.DragEvent;
 import android.view.Gravity;
@@ -43,16 +46,20 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 import com.tondz.ghephinh.R;
+import com.tondz.ghephinh.adapters.HinhNenAdapter;
 import com.tondz.ghephinh.adapters.KiHieuAdapter;
 import com.tondz.ghephinh.adapters.KiHieuTextAdapter;
 import com.tondz.ghephinh.databinding.ActivityGhepKiHieuBinding;
 import com.tondz.ghephinh.models.Entity;
+import com.tondz.ghephinh.models.HinhNen;
 import com.tondz.ghephinh.models.KiHieu;
 import com.tondz.ghephinh.utils.Common;
 
 import org.imaginativeworld.whynotimagecarousel.ImageCarousel;
 import org.imaginativeworld.whynotimagecarousel.model.CarouselItem;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -76,6 +83,7 @@ public class GhepKiHieuActivity extends AppCompatActivity {
     FirebaseDatabase database;
     DatabaseReference reference;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -92,6 +100,21 @@ public class GhepKiHieuActivity extends AppCompatActivity {
         binding.titile.setText(Common.entity.getName());
         database = FirebaseDatabase.getInstance();
         reference = database.getReference();
+    }
+
+    private void dialogHinhNen() {
+        Dialog dialog = new Dialog(this);
+        dialog.setContentView(R.layout.dialog_choose_image);
+        RecyclerView recyclerView = dialog.findViewById(R.id.recyclerViewNen);
+        HinhNenAdapter hinhnenAdapter = new HinhNenAdapter(Common.hinhGhepList, GhepKiHieuActivity.this, new HinhNenAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(String hinhAnh) {
+                Picasso.get().load(hinhAnh).into(binding.imgBackground);
+            }
+        });
+        recyclerView.setAdapter(hinhnenAdapter);
+
+        dialog.show();
     }
 
     private void dialogKiHieu() {
@@ -239,9 +262,53 @@ public class GhepKiHieuActivity extends AppCompatActivity {
         dialog.show();
     }
 
+    private Bitmap captureFullScreen(Activity activity) {
+        View rootView = activity.getWindow().getDecorView();
+        rootView.setDrawingCacheEnabled(true);
+        Bitmap bitmap = Bitmap.createBitmap(rootView.getDrawingCache());
+        rootView.setDrawingCacheEnabled(false);
+        return bitmap;
+    }
+
+    private void saveBitmapToGallery(Bitmap bitmap) {
+        String savedImagePath = null;
+        String imageFileName = "screenshot_" + System.currentTimeMillis() + ".jpg";
+
+        // Thư mục lưu ảnh
+        File storageDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) + "/Screenshots");
+        if (!storageDir.exists()) {
+            storageDir.mkdirs();
+        }
+
+        File imageFile = new File(storageDir, imageFileName);
+        try {
+            FileOutputStream fos = new FileOutputStream(imageFile);
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 90, fos);
+            fos.close();
+            savedImagePath = imageFile.getAbsolutePath();
+
+            // Thêm vào thư viện
+            MediaScannerConnection.scanFile(this, new String[]{savedImagePath}, null, null);
+
+            Toast.makeText(this, "Ảnh đã lưu vào: " + savedImagePath, Toast.LENGTH_SHORT).show();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     @SuppressLint("ClickableViewAccessibility")
     void onClick() {
+        binding.btnCapture.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Bitmap screenshot = captureFullScreen(GhepKiHieuActivity.this);
+                saveBitmapToGallery(screenshot);
+            }
+        });
+        binding.btnImage.setOnClickListener(view -> {
+            dialogHinhNen();
+        });
+
         binding.btnMenu.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -271,6 +338,72 @@ public class GhepKiHieuActivity extends AppCompatActivity {
         binding.info.setOnClickListener(v -> {
             showImageInfoDialog(Common.entity.getName(), Common.entity.getSingle_image_url(), Common.entity.getInfo());
         });
+        binding.bntFlip.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (currentImageView != null) {
+                    currentImageView.setScaleX(currentImageView.getScaleX() * -1);
+                }
+            }
+        });
+        binding.btnRight.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (currentImageView != null) {
+                    float currentRotation = currentImageView.getRotation();
+                    currentImageView.setRotation(currentRotation + 45f); // Xoay thêm 45 độ
+                }
+            }
+        });
+        binding.btnLeft.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (currentImageView != null) {
+                    float currentRotation = currentImageView.getRotation();
+                    currentImageView.setRotation(currentRotation - 45f); // Xoay ngược 45 độ
+                }
+            }
+        });
+        binding.btnZoomTo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (currentImageView != null) {
+                    float maxScale = 5.0f; // Tỉ lệ phóng to tối đa
+                    float minScale = 0.5f; // Tỉ lệ thu nhỏ tối thiểu
+
+                    scaleFactor += 0.1f;
+                    scale = Math.max(minScale, Math.min(scaleFactor, maxScale));
+
+                    ViewGroup.LayoutParams params = currentImageView.getLayoutParams();
+                    params.width = (int) (currentImageView.getDrawable().getIntrinsicWidth() * scale);
+                    params.height = (int) (currentImageView.getDrawable().getIntrinsicHeight() * scale);
+                    currentImageView.setLayoutParams(params);
+
+                    imageViewList.set(currentIndex, currentImageView);
+                }
+            }
+        });
+        binding.btnZoomNho.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (currentImageView != null) {
+                    float maxScale = 5.0f; // Tỉ lệ phóng to tối đa
+                    float minScale = 0.5f; // Tỉ lệ thu nhỏ tối thiểu
+
+                    scaleFactor -= 0.1f;
+                    scale = Math.max(minScale, Math.min(scaleFactor, maxScale));
+
+                    ViewGroup.LayoutParams params = currentImageView.getLayoutParams();
+                    params.width = (int) (currentImageView.getDrawable().getIntrinsicWidth() * scale);
+                    params.height = (int) (currentImageView.getDrawable().getIntrinsicHeight() * scale);
+                    currentImageView.setLayoutParams(params);
+
+                    imageViewList.set(currentIndex, currentImageView);
+                }
+            }
+        });
+
+
         binding.frameLayout.setOnDragListener(new View.OnDragListener() {
             @Override
             public boolean onDrag(View v, DragEvent event) {
@@ -333,10 +466,7 @@ public class GhepKiHieuActivity extends AppCompatActivity {
                             lastTouchY = event.getRawY();
                             break;
                         }
-
                 }
-
-
                 return true;
             }
         });

@@ -2,6 +2,7 @@ package com.tondz.ghephinh.utils;
 
 import com.tondz.ghephinh.models.CauHoi;
 import com.tondz.ghephinh.models.Entity;
+import com.tondz.ghephinh.models.HinhNen;
 import com.tondz.ghephinh.models.KiHieu;
 
 import java.util.ArrayList;
@@ -16,11 +17,8 @@ public class Common {
     public static List<Entity> entityList;
     public static Entity entity;
     public static List<KiHieu> kiHieuList = new ArrayList<>();
+    public static List<HinhNen> hinhGhepList = new ArrayList<>();
     public static Set<String> loaiKiHieuList;
-    public static KiHieu kiHieu;
     public static CauHoi CAU_HOI;
-    public static int vitri = 0;
-    public static int SO_LAN_CHOI = 3;
-    public static int CHECK_SOUND = 1;
     public static ArrayList<CauHoi> cauHoiArrayList;
 }

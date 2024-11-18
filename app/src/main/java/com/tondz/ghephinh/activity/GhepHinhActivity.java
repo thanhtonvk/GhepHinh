@@ -3,15 +3,19 @@ package com.tondz.ghephinh.activity;
 import static com.tondz.ghephinh.utils.Common.entityList;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ClipData;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.Matrix;
+import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.os.Environment;
 import android.text.InputType;
 import android.util.Log;
 import android.view.DragEvent;
@@ -25,6 +29,7 @@ import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
@@ -53,6 +58,8 @@ import org.imaginativeworld.whynotimagecarousel.ImageCarousel;
 import org.imaginativeworld.whynotimagecarousel.model.CarouselItem;
 import org.w3c.dom.Text;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -226,9 +233,50 @@ public class GhepHinhActivity extends AppCompatActivity {
         dialog.show();
     }
 
+    private Bitmap captureFullScreen(Activity activity) {
+        View rootView = activity.getWindow().getDecorView();
+        rootView.setDrawingCacheEnabled(true);
+        Bitmap bitmap = Bitmap.createBitmap(rootView.getDrawingCache());
+        rootView.setDrawingCacheEnabled(false);
+        return bitmap;
+    }
+
+    private void saveBitmapToGallery(Bitmap bitmap) {
+        String savedImagePath = null;
+        String imageFileName = "screenshot_" + System.currentTimeMillis() + ".jpg";
+
+        // Thư mục lưu ảnh
+        File storageDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) + "/Screenshots");
+        if (!storageDir.exists()) {
+            storageDir.mkdirs();
+        }
+
+        File imageFile = new File(storageDir, imageFileName);
+        try {
+            FileOutputStream fos = new FileOutputStream(imageFile);
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 90, fos);
+            fos.close();
+            savedImagePath = imageFile.getAbsolutePath();
+
+            // Thêm vào thư viện
+            MediaScannerConnection.scanFile(this, new String[]{savedImagePath}, null, null);
+
+            Toast.makeText(this, "Ảnh đã lưu vào: " + savedImagePath, Toast.LENGTH_SHORT).show();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 
     @SuppressLint("ClickableViewAccessibility")
     void onClick() {
+        binding.btnCapture.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Bitmap screenshot = captureFullScreen(GhepHinhActivity.this);
+                saveBitmapToGallery(screenshot);
+            }
+        });
         binding.btnNote.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -258,6 +306,46 @@ public class GhepHinhActivity extends AppCompatActivity {
                 startActivity(new Intent(getApplicationContext(), CauHoiActivity.class));
             }
         });
+        binding.btnZoomTo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (currentImageView != null) {
+                    float maxScale = 5.0f; // Tỉ lệ phóng to tối đa
+                    float minScale = 0.5f; // Tỉ lệ thu nhỏ tối thiểu
+
+                    scaleFactor += 0.1f;
+                    scale = Math.max(minScale, Math.min(scaleFactor, maxScale));
+
+                    ViewGroup.LayoutParams params = currentImageView.getLayoutParams();
+                    params.width = (int) (currentImageView.getDrawable().getIntrinsicWidth() * scale);
+                    params.height = (int) (currentImageView.getDrawable().getIntrinsicHeight() * scale);
+                    currentImageView.setLayoutParams(params);
+
+                    imageViewList.set(currentIndex, currentImageView);
+                }
+            }
+        });
+        binding.btnZoomNho.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (currentImageView != null) {
+                    float maxScale = 5.0f; // Tỉ lệ phóng to tối đa
+                    float minScale = 0.5f; // Tỉ lệ thu nhỏ tối thiểu
+
+                    scaleFactor -= 0.1f;
+                    scale = Math.max(minScale, Math.min(scaleFactor, maxScale));
+
+                    ViewGroup.LayoutParams params = currentImageView.getLayoutParams();
+                    params.width = (int) (currentImageView.getDrawable().getIntrinsicWidth() * scale);
+                    params.height = (int) (currentImageView.getDrawable().getIntrinsicHeight() * scale);
+                    currentImageView.setLayoutParams(params);
+
+                    imageViewList.set(currentIndex, currentImageView);
+                }
+            }
+        });
+
+
         binding.searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
