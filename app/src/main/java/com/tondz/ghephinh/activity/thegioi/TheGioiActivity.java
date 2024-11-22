@@ -16,6 +16,7 @@ import com.tondz.ghephinh.databinding.ActivityTheGioiBinding;
 import com.tondz.ghephinh.models.CauHoi;
 import com.tondz.ghephinh.models.Entity;
 import com.tondz.ghephinh.models.HinhNen;
+import com.tondz.ghephinh.models.Preview;
 import com.tondz.ghephinh.utils.Common;
 
 import java.util.ArrayList;
@@ -52,6 +53,7 @@ public class TheGioiActivity extends AppCompatActivity {
                 entityList.clear();
                 Common.hinhGhepList.clear();
                 Common.cauHoiArrayList = new ArrayList<>();
+                Common.previewList.clear();
                 for (DataSnapshot dataSnapshot :
                         snapshot.getChildren()) {
                     if (dataSnapshot.getKey().equalsIgnoreCase("CauHoi")) {
@@ -68,6 +70,11 @@ public class TheGioiActivity extends AppCompatActivity {
                             Common.hinhGhepList.add(snapShotCauHoi.getValue(HinhNen.class));
                         }
 
+                    } else if (dataSnapshot.getKey().equalsIgnoreCase("Preview")) {
+                        for (DataSnapshot previewSnapshot : dataSnapshot.getChildren()
+                        ) {
+                            Common.previewList.add(previewSnapshot.getValue(Preview.class));
+                        }
                     } else {
                         Entity entity = dataSnapshot.getValue(Entity.class);
                         entityList.add(entity);
@@ -90,7 +97,7 @@ public class TheGioiActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 Entity entity = snapshot.getValue(Entity.class);
-                entity.setSingle_image_url("https://firebasestorage.googleapis.com/v0/b/baucucanbo.appspot.com/o/z6037342593973_4ec952788714dae8137f0b953d8ba898.gif?alt=media&token=dab222d9-2992-48ed-bebc-8dab1fca915e");
+                entity.setSingle_image_url("https://firebasestorage.googleapis.com/v0/b/baucucanbo.appspot.com/o/z6057632794328_62598c90f97c1a51b0b29254bfe0fc45.jpg?alt=media&token=a1bd7a97-be5b-49ae-9e7b-d4573fe3e38d");
                 entityList.add(entity);
                 Log.e("TAG", "onDataChange: " + snapshot);
                 adapter.notifyDataSetChanged();

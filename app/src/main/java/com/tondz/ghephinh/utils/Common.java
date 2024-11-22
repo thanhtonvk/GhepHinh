@@ -4,6 +4,7 @@ import com.tondz.ghephinh.models.CauHoi;
 import com.tondz.ghephinh.models.Entity;
 import com.tondz.ghephinh.models.HinhNen;
 import com.tondz.ghephinh.models.KiHieu;
+import com.tondz.ghephinh.models.Preview;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,4 +22,5 @@ public class Common {
     public static Set<String> loaiKiHieuList;
     public static CauHoi CAU_HOI;
     public static ArrayList<CauHoi> cauHoiArrayList;
+    public static List<Preview> previewList = new ArrayList<>();
 }

@@ -5,6 +5,7 @@ import static com.tondz.ghephinh.utils.Common.entityList;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.ClipData;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -18,6 +19,7 @@ import android.os.CountDownTimer;
 import android.os.Environment;
 import android.text.InputType;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.DragEvent;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -70,6 +72,8 @@ public class GhepHinhActivity extends AppCompatActivity {
     private ImageView currentImageView;
     private float lastTouchX, lastTouchY;
     private List<ImageView> imageViewList = new ArrayList<>();
+    private List<TextView> textViewList = new ArrayList<>();
+    private List<Integer> textSizeList = new ArrayList<>();
     int currentIndex = -1;
     ImageAdapter adapter;
     private float scaleFactor = 1.0f;
@@ -80,6 +84,7 @@ public class GhepHinhActivity extends AppCompatActivity {
     private boolean canEdit = true;
     private List<Integer> idxTemp = new ArrayList<>();
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -88,6 +93,25 @@ public class GhepHinhActivity extends AppCompatActivity {
         onClick();
         init();
         showInputTimeDialog();
+        loadPreview();
+    }
+
+    private void dialogPreview() {
+
+        if (!Common.previewList.isEmpty()) {
+            Dialog dialog = new Dialog(GhepHinhActivity.this);
+            dialog.setContentView(R.layout.dialog_show_image);
+            ImageView img = dialog.findViewById(R.id.imgPreviewBig);
+            Picasso.get().load(Common.previewList.get(0).getUrl()).into(img);
+            dialog.show();
+        }
+
+    }
+
+    private void loadPreview() {
+        if (!Common.previewList.isEmpty()) {
+            Picasso.get().load(Common.previewList.get(0).getUrl()).into(binding.preView);
+        }
     }
 
     private void startTimer() {
@@ -187,6 +211,7 @@ public class GhepHinhActivity extends AppCompatActivity {
         dialog.show();
     }
 
+
     private void showDialogNote() {
         // Sử dụng LayoutInflater để nạp layout dialog_input_time.xml
         LayoutInflater inflater = LayoutInflater.from(this);
@@ -225,6 +250,8 @@ public class GhepHinhActivity extends AppCompatActivity {
                         binding.frameLayout.addView(textView, params);
 
                         setTouchTextView(textView); // Nếu bạn cần touch listener cho hình ảnh, hãy bật lại dòng này
+                        textViewList.add(textView);
+                        textSizeList.add(20);
                     }
                 })
                 .setNegativeButton("Huỷ", (dialog, which) -> dialog.dismiss());
@@ -270,6 +297,12 @@ public class GhepHinhActivity extends AppCompatActivity {
 
     @SuppressLint("ClickableViewAccessibility")
     void onClick() {
+        binding.preView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialogPreview();
+            }
+        });
         binding.btnCapture.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -323,6 +356,15 @@ public class GhepHinhActivity extends AppCompatActivity {
 
                     imageViewList.set(currentIndex, currentImageView);
                 }
+                if (currentTextView != null) {
+                    int idx = textViewList.indexOf(currentTextView);
+                    int currentSize = textSizeList.get(idx);
+                    currentSize += 1;
+                    textSizeList.set(idx, currentSize);
+                    currentTextView.setTextSize(currentSize);
+                    textViewList.set(idx, currentTextView);
+
+                }
             }
         });
         binding.btnZoomNho.setOnClickListener(new View.OnClickListener() {
@@ -332,7 +374,7 @@ public class GhepHinhActivity extends AppCompatActivity {
                     float maxScale = 5.0f; // Tỉ lệ phóng to tối đa
                     float minScale = 0.5f; // Tỉ lệ thu nhỏ tối thiểu
 
-                    scaleFactor -= 0.1f;
+                    scaleFactor -= 0.01f;
                     scale = Math.max(minScale, Math.min(scaleFactor, maxScale));
 
                     ViewGroup.LayoutParams params = currentImageView.getLayoutParams();
@@ -341,6 +383,15 @@ public class GhepHinhActivity extends AppCompatActivity {
                     currentImageView.setLayoutParams(params);
 
                     imageViewList.set(currentIndex, currentImageView);
+                }
+                if (currentTextView != null) {
+                    int idx = textViewList.indexOf(currentTextView);
+                    int currentSize = textSizeList.get(idx);
+                    currentSize -= 1;
+                    textSizeList.set(idx, currentSize);
+                    currentTextView.setTextSize(currentSize);
+                    textViewList.set(idx, currentTextView);
+
                 }
             }
         });
@@ -377,22 +428,27 @@ public class GhepHinhActivity extends AppCompatActivity {
                         final float dropY = event.getY();
                         ClipData.Item item = event.getClipData().getItemAt(0);
 
-                        Integer chooseIdx = Integer.parseInt(item.getText().toString());
+                        String name = item.getText().toString();
+                        Log.e("TAG", "onDrag: name " + name);
+                        int chooseIdx = getIndex(name);
 
-                        ImageView imageView = new ImageView(GhepHinhActivity.this);
-                        Picasso.get().load(entityList.get(chooseIdx).getSingle_image_url()).into(imageView);
-                        imageView.setScaleX(0.5f);
-                        imageView.setScaleY(0.5f);
+                        if (chooseIdx >= 0) {
+                            ImageView imageView = new ImageView(GhepHinhActivity.this);
+                            Picasso.get().load(entityList.get(chooseIdx).getSingle_image_url()).into(imageView);
+                            imageView.setScaleX(0.5f);
+                            imageView.setScaleY(0.5f);
 
-                        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT);
-                        params.leftMargin = (int) dropX; // Tinh chỉnh vị trí x
-                        params.topMargin = (int) dropY;  // Tinh chỉnh vị trí y
-                        imageView.setLayoutParams(params);
-                        binding.frameLayout.addView(imageView);
-                        setTouchListener(imageView);
-                        imageViewList.add(imageView);
-                        idxTemp.add(chooseIdx);
-                        Log.e("TAG", "onDrag: " + entityList.get(chooseIdx).getName());
+                            FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT);
+                            params.leftMargin = (int) dropX; // Tinh chỉnh vị trí x
+                            params.topMargin = (int) dropY;  // Tinh chỉnh vị trí y
+                            imageView.setLayoutParams(params);
+                            binding.frameLayout.addView(imageView);
+                            setTouchListener(imageView);
+                            imageViewList.add(imageView);
+                            idxTemp.add(chooseIdx);
+                            Log.e("TAG", "onDrag: " + entityList.get(chooseIdx).getName());
+                        }
+
                         return true;
                     case DragEvent.ACTION_DRAG_ENDED:
                         return true;
@@ -432,6 +488,15 @@ public class GhepHinhActivity extends AppCompatActivity {
         });
     }
 
+    private int getIndex(String name) {
+        for (Entity entity : entityList
+        ) {
+            if (String.valueOf(entity.getName()).equalsIgnoreCase(String.valueOf(name))) {
+                return entityList.indexOf(entity);
+            }
+        }
+        return -1;
+    }
 
     private void moveAllImages(float dX, float dY) {
         for (int i = 0; i < binding.frameLayout.getChildCount(); i++) {
@@ -452,6 +517,9 @@ public class GhepHinhActivity extends AppCompatActivity {
             private float lastTouchX;
             private float lastTouchY;
             private float dX, dY;
+            private static final long DOUBLE_CLICK_TIMEOUT = 300; // thời gian cho phép giữa hai lần click (300ms)
+            private int clickCount = 0;
+            private long lastClickTime = 0;
 
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -462,7 +530,30 @@ public class GhepHinhActivity extends AppCompatActivity {
                         lastTouchY = event.getRawY();
                         dX = v.getX() - lastTouchX;
                         dY = v.getY() - lastTouchY;
+                        int index = textViewList.indexOf(v);
+                        if (index != -1) {
+                            currentIndex = index;
+                        }
+
+                        // Kiểm tra double click
+                        long currentTime = System.currentTimeMillis();
+                        if (currentTime - lastClickTime < DOUBLE_CLICK_TIMEOUT) {
+                            clickCount++;
+                        } else {
+                            clickCount = 1; // Reset click count nếu thời gian giữa các click quá lâu
+                        }
+                        lastClickTime = currentTime;
+
+                        // Kiểm tra nếu là double click
+                        if (clickCount == 2) {
+                            int idx = textViewList.indexOf(currentTextView);
+                            Log.e("TAG", "onTouch: " + idx);
+                            showDialogTextView(idx);
+                            clickCount = 0; // Reset sau khi phát hiện double click
+                        }
+
                         break;
+
 
                     case MotionEvent.ACTION_MOVE:
                         float newX = event.getRawX() + dX;
@@ -529,6 +620,33 @@ public class GhepHinhActivity extends AppCompatActivity {
                 return true;
             }
         });
+    }
+
+    private void showDialogTextView(int idx) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(GhepHinhActivity.this);
+        builder.setTitle(textViewList.get(idx).getText().toString());
+
+
+        builder.setNegativeButton("Xoá", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                binding.frameLayout.removeView(textViewList.get(idx));
+                textViewList.remove(idx);
+                textSizeList.remove(idx);
+                dialog.dismiss();
+            }
+        });
+        builder.setNeutralButton("Hủy", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+
+
+        // Tạo và hiển thị dialog
+        AlertDialog dialog = builder.create();
+        dialog.show();
     }
 
     private void showDialogArea(int idx) {

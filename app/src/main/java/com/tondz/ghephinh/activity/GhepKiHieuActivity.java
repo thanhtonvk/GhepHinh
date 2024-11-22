@@ -15,6 +15,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.text.InputType;
+import android.util.Log;
 import android.view.DragEvent;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -83,6 +84,8 @@ public class GhepKiHieuActivity extends AppCompatActivity {
     FirebaseDatabase database;
     DatabaseReference reference;
 
+    private List<TextView> textViewList = new ArrayList<>();
+    private List<Integer> textSizeList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -192,6 +195,8 @@ public class GhepKiHieuActivity extends AppCompatActivity {
                         binding.frameLayout.addView(textView, params);
 
                         setTouchTextView(textView); // Nếu bạn cần touch listener cho hình ảnh, hãy bật lại dòng này
+                        textViewList.add(textView);
+                        textSizeList.add(20);
                     }
                 })
                 .setNegativeButton("Huỷ", (dialog, which) -> dialog.dismiss());
@@ -208,6 +213,9 @@ public class GhepKiHieuActivity extends AppCompatActivity {
             private float lastTouchX;
             private float lastTouchY;
             private float dX, dY;
+            private static final long DOUBLE_CLICK_TIMEOUT = 300; // thời gian cho phép giữa hai lần click (300ms)
+            private int clickCount = 0;
+            private long lastClickTime = 0;
 
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -218,7 +226,30 @@ public class GhepKiHieuActivity extends AppCompatActivity {
                         lastTouchY = event.getRawY();
                         dX = v.getX() - lastTouchX;
                         dY = v.getY() - lastTouchY;
+                        int index = textViewList.indexOf(v);
+                        if (index != -1) {
+                            currentIndex = index;
+                        }
+
+                        // Kiểm tra double click
+                        long currentTime = System.currentTimeMillis();
+                        if (currentTime - lastClickTime < DOUBLE_CLICK_TIMEOUT) {
+                            clickCount++;
+                        } else {
+                            clickCount = 1; // Reset click count nếu thời gian giữa các click quá lâu
+                        }
+                        lastClickTime = currentTime;
+
+                        // Kiểm tra nếu là double click
+                        if (clickCount == 2) {
+                            int idx = textViewList.indexOf(currentTextView);
+                            Log.e("TAG", "onTouch: " + idx);
+                            showDialogTextView(idx);
+                            clickCount = 0; // Reset sau khi phát hiện double click
+                        }
+
                         break;
+
 
                     case MotionEvent.ACTION_MOVE:
                         float newX = event.getRawX() + dX;
@@ -381,6 +412,15 @@ public class GhepKiHieuActivity extends AppCompatActivity {
 
                     imageViewList.set(currentIndex, currentImageView);
                 }
+                if (currentTextView != null) {
+                    int idx = textViewList.indexOf(currentTextView);
+                    int currentSize = textSizeList.get(idx);
+                    currentSize += 1;
+                    textSizeList.set(idx, currentSize);
+                    currentTextView.setTextSize(currentSize);
+                    textViewList.set(idx, currentTextView);
+
+                }
             }
         });
         binding.btnZoomNho.setOnClickListener(new View.OnClickListener() {
@@ -399,6 +439,15 @@ public class GhepKiHieuActivity extends AppCompatActivity {
                     currentImageView.setLayoutParams(params);
 
                     imageViewList.set(currentIndex, currentImageView);
+                }
+                if (currentTextView != null) {
+                    int idx = textViewList.indexOf(currentTextView);
+                    int currentSize = textSizeList.get(idx);
+                    currentSize -= 1;
+                    textSizeList.set(idx, currentSize);
+                    currentTextView.setTextSize(currentSize);
+                    textViewList.set(idx, currentTextView);
+
                 }
             }
         });
@@ -472,11 +521,37 @@ public class GhepKiHieuActivity extends AppCompatActivity {
         });
     }
 
+    private void showDialogTextView(int idx) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(GhepKiHieuActivity.this);
+        builder.setTitle(textViewList.get(idx).getText().toString());
+
+
+        builder.setNegativeButton("Xoá", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                binding.frameLayout.removeView(textViewList.get(idx));
+                textViewList.remove(idx);
+                textSizeList.remove(idx);
+                dialog.dismiss();
+            }
+        });
+        builder.setNeutralButton("Hủy", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+
+
+        // Tạo và hiển thị dialog
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
 
     private void moveAllImages(float dX, float dY) {
         for (int i = 0; i < binding.frameLayout.getChildCount(); i++) {
             View child = binding.frameLayout.getChildAt(i);
-            if (child instanceof ImageView) {
+            if (child instanceof ImageView || child instanceof TextView) {
                 float newX = child.getX() + dX;
                 float newY = child.getY() + dY;
                 child.animate().x(newX).y(newY).setDuration(0).start();

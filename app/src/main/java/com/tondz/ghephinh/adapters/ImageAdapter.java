@@ -48,8 +48,8 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
             Picasso.get().load(entity.getSingle_image_url()).into(holder.imgView);
         }
         holder.imgView.setOnLongClickListener(v -> {
-            ClipData.Item item = new ClipData.Item(position + "");
-            ClipData dragData = new ClipData(position + "", new String[]{ClipDescription.MIMETYPE_TEXT_PLAIN}, item);
+            ClipData.Item item = new ClipData.Item(entity.getName());
+            ClipData dragData = new ClipData(entity.getName(), new String[]{ClipDescription.MIMETYPE_TEXT_PLAIN}, item);
             Log.e("TAG", "onBindViewHolder: " + entity.getName());
             View.DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(holder.imgView);
             v.startDragAndDrop(dragData, shadowBuilder, null, 0);

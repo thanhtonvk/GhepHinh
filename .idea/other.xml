@@ -6,10 +6,10 @@
         <PersistentDeviceSelectionData>
           <option name="api" value="33" />
           <option name="brand" value="google" />
-          <option name="codename" value="felix" />
-          <option name="id" value="felix" />
+          <option name="codename" value="felix_camera" />
+          <option name="id" value="felix_camera" />
           <option name="manufacturer" value="Google" />
-          <option name="name" value="Pixel Fold" />
+          <option name="name" value="Pixel Fold (Camera-enabled)" />
           <option name="screenDensity" value="420" />
           <option name="screenX" value="2208" />
           <option name="screenY" value="1840" />
@@ -148,7 +148,7 @@
           <option name="screenY" value="2340" />
         </PersistentDeviceSelectionData>
         <PersistentDeviceSelectionData>
-          <option name="api" value="34" />
+          <option name="api" value="33" />
           <option name="brand" value="google" />
           <option name="codename" value="felix" />
           <option name="id" value="felix" />
@@ -159,12 +159,12 @@
           <option name="screenY" value="1840" />
         </PersistentDeviceSelectionData>
         <PersistentDeviceSelectionData>
-          <option name="api" value="33" />
+          <option name="api" value="34" />
           <option name="brand" value="google" />
-          <option name="codename" value="felix_camera" />
-          <option name="id" value="felix_camera" />
+          <option name="codename" value="felix" />
+          <option name="id" value="felix" />
           <option name="manufacturer" value="Google" />
-          <option name="name" value="Pixel Fold (Camera-enabled)" />
+          <option name="name" value="Pixel Fold" />
           <option name="screenDensity" value="420" />
           <option name="screenX" value="2208" />
           <option name="screenY" value="1840" />
