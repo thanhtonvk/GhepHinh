@@ -54,7 +54,7 @@ public class VietNamAdapter extends RecyclerView.Adapter<VietNamAdapter.ViewHold
         filteredList.clear();
         if (!query.isEmpty()) {
             for (Entity item : entityList) {
-                if (item.getName().toLowerCase().contains(query.toLowerCase())) {
+                if (String.valueOf(item.getName()).toLowerCase().contains(query.toLowerCase())) {
                     filteredList.add(item);
                 }
             }
