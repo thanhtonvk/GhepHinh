@@ -41,6 +41,7 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.github.chrisbanes.photoview.PhotoView;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -101,9 +102,13 @@ public class GhepHinhActivity extends AppCompatActivity {
         if (!Common.previewList.isEmpty()) {
             Dialog dialog = new Dialog(GhepHinhActivity.this);
             dialog.setContentView(R.layout.dialog_show_image);
-            ImageView img = dialog.findViewById(R.id.imgPreviewBig);
+            PhotoView img = dialog.findViewById(R.id.imgPreviewBig);
+
+// Load image using Picasso
             Picasso.get().load(Common.previewList.get(0).getUrl()).into(img);
+
             dialog.show();
+
         }
 
     }
@@ -520,11 +525,11 @@ public class GhepHinhActivity extends AppCompatActivity {
             private static final long DOUBLE_CLICK_TIMEOUT = 300; // thời gian cho phép giữa hai lần click (300ms)
             private int clickCount = 0;
             private long lastClickTime = 0;
-
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
+                        currentImageView = null;
                         currentTextView = textView;
                         lastTouchX = event.getRawX();
                         lastTouchY = event.getRawY();
@@ -576,11 +581,11 @@ public class GhepHinhActivity extends AppCompatActivity {
             private static final long DOUBLE_CLICK_TIMEOUT = 300; // thời gian cho phép giữa hai lần click (300ms)
             private int clickCount = 0;
             private long lastClickTime = 0;
-
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
+                        currentTextView = null;
                         currentImageView = imageView;
                         lastTouchX = event.getRawX();
                         lastTouchY = event.getRawY();

@@ -24,6 +24,7 @@ import com.tondz.ghephinh.models.CauHoi;
 import com.tondz.ghephinh.utils.Common;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
@@ -50,6 +51,7 @@ public class CauHoiActivity extends AppCompatActivity {
         correctSound = MediaPlayer.create(this, R.raw.correct_sound);
         tv_cauhoi.setAnimation(dsHieuUng.get(random.nextInt(3)));
 //        loadCauHoi();
+        Collections.shuffle(Common.cauHoiArrayList);
         nextCauHoi();
         onClick();
     }

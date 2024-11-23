@@ -221,6 +221,7 @@ public class GhepKiHieuActivity extends AppCompatActivity {
             public boolean onTouch(View v, MotionEvent event) {
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
+                        currentImageView = null;
                         currentTextView = textView;
                         lastTouchX = event.getRawX();
                         lastTouchY = event.getRawY();
@@ -653,6 +654,7 @@ public class GhepKiHieuActivity extends AppCompatActivity {
             public boolean onTouch(View v, MotionEvent event) {
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
+                        currentTextView  = null;
                         currentImageView = imageView;
                         lastTouchX = event.getRawX();
                         lastTouchY = event.getRawY();

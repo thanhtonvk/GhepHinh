@@ -41,7 +41,10 @@ public class KiHieuAdapter extends RecyclerView.Adapter<KiHieuAdapter.ViewHolder
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         KiHieu kiHieu = kiHieuList.get(position);
-        Picasso.get().load(kiHieu.getSingle_image_url()).into(holder.imgView);
+        if(kiHieu.getSingle_image_url()!=null){
+            Picasso.get().load(kiHieu.getSingle_image_url()).into(holder.imgView);
+        }
+
         holder.tvName.setText(kiHieu.getName());
         holder.imgView.setOnLongClickListener(v -> {
             ClipData.Item item = new ClipData.Item(position + "");

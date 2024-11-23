@@ -44,7 +44,7 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Entity entity = filteredList.get(position);
         holder.tvName.setText(entity.getName());
-        if (!entity.getSingle_image_url().isEmpty()) {
+        if (entity.getSingle_image_url() != null) {
             Picasso.get().load(entity.getSingle_image_url()).into(holder.imgView);
         }
         holder.imgView.setOnLongClickListener(v -> {
@@ -55,6 +55,8 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
             v.startDragAndDrop(dragData, shadowBuilder, null, 0);
             return true;
         });
+
+
     }
 
     @SuppressLint("NotifyDataSetChanged")
