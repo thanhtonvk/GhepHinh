@@ -45,7 +45,11 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
         Entity entity = filteredList.get(position);
         holder.tvName.setText(entity.getName());
         if (entity.getSingle_image_url() != null) {
-            Picasso.get().load(entity.getSingle_image_url()).into(holder.imgView);
+            try {
+                Picasso.get().load(entity.getSingle_image_url()).into(holder.imgView);
+            } catch (Exception e) {
+                return;
+            }
         }
         holder.imgView.setOnLongClickListener(v -> {
             ClipData.Item item = new ClipData.Item(entity.getName());

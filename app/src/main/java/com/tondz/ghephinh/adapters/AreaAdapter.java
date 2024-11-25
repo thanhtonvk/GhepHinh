@@ -40,8 +40,15 @@ public class AreaAdapter extends RecyclerView.Adapter<AreaAdapter.ViewHolder> {
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, @SuppressLint("RecyclerView") int position) {
         Entity entity = entityList.get(position);
-        holder.tvName.setText(entity.getName());
-        Picasso.get().load(entity.getSingle_image_url()).into(holder.imgView);
+        if (entity != null) {
+            holder.tvName.setText(entity.getName());
+            try {
+                Picasso.get().load(entity.getSingle_image_url()).into(holder.imgView);
+            } catch (Exception e) {
+                return;
+            }
+        }
+
         holder.itemView.setOnClickListener(v -> {
             Common.index = position;
             context.startActivity(new Intent(context, AreaActivity.class));

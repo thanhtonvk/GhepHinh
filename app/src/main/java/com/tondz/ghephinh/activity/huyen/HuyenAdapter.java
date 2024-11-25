@@ -46,7 +46,11 @@ public class HuyenAdapter extends RecyclerView.Adapter<HuyenAdapter.ViewHolder> 
         Entity entity = filteredList.get(position);
         holder.tvName.setText(entity.getName());
         if (!entity.getSingle_image_url().isEmpty()) {
-            Picasso.get().load(entity.getSingle_image_url()).into(holder.imgView);
+            try {
+                Picasso.get().load(entity.getSingle_image_url()).into(holder.imgView);
+            } catch (Exception e) {
+                return;
+            }
         }
         holder.itemView.setOnClickListener(v -> {
             Common.idHuyen = entity.getId();

@@ -78,13 +78,13 @@ public class GhepHinhActivity extends AppCompatActivity {
     int currentIndex = -1;
     ImageAdapter adapter;
     private float scaleFactor = 1.0f;
-    private float minScaleFactor = 1.0f;  // Tỷ lệ zoom out tối thiểu (kích thước ban đầu)
-    private float maxScaleFactor = 3.0f;  // Tỷ lệ zoom in tối đa
+    //    private float minScaleFactor = 1.0f;  // Tỷ lệ zoom out tối thiểu (kích thước ban đầu)
+//    private float maxScaleFactor = 3.0f;  // Tỷ lệ zoom in tối đa
     private CountDownTimer countDownTimer;
     private long timeLeftInMillis = 60000; // 1 phút
-    private boolean canEdit = true;
+    //    private boolean canEdit = true;
     private List<Integer> idxTemp = new ArrayList<>();
-
+    List<Float> scaleFactors = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -321,19 +321,22 @@ public class GhepHinhActivity extends AppCompatActivity {
                 showDialogNote();
             }
         });
-        binding.btnZoomIn.setOnClickListener(v -> {
-            scaleFactor += 0.1f;
-            scaleFactor = Math.min(scaleFactor, maxScaleFactor); // Giới hạn tỷ lệ zoom in tối đa
-            binding.frameLayout.setScaleX(scaleFactor);
-            binding.frameLayout.setScaleY(scaleFactor);
-        });
+        float minScaleFactor = 1.0f; // Giới hạn nhỏ nhất
+        float maxScaleFactor = 3.0f; // Giới hạn lớn nhất
 
-        // Sự kiện nút Zoom Out
+        binding.btnZoomIn.setOnClickListener(v -> {
+            if (scaleFactor < maxScaleFactor) { // Kiểm tra giới hạn zoom in
+                scaleFactor += 0.1f;
+                binding.frameLayout.setScaleX(scaleFactor);
+                binding.frameLayout.setScaleY(scaleFactor);
+            }
+        });
         binding.btnZoomOut.setOnClickListener(v -> {
-            scaleFactor -= 0.1f;
-            scaleFactor = Math.max(scaleFactor, minScaleFactor); // Giới hạn tỷ lệ zoom out tối thiểu (kích thước ban đầu)
-            binding.frameLayout.setScaleX(scaleFactor);
-            binding.frameLayout.setScaleY(scaleFactor);
+            if (scaleFactor > minScaleFactor) { // Kiểm tra giới hạn zoom out
+                scaleFactor -= 0.1f;
+                binding.frameLayout.setScaleX(scaleFactor);
+                binding.frameLayout.setScaleY(scaleFactor);
+            }
         });
         binding.info.setOnClickListener(v -> {
             showImageInfoDialog(Common.entity);
@@ -348,11 +351,15 @@ public class GhepHinhActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (currentImageView != null) {
-                    float maxScale = 5.0f; // Tỉ lệ phóng to tối đa
+                    int idx = imageViewList.indexOf(currentImageView);
+                    float currentScale = scaleFactors.get(idx);
+
+                    float maxScale = 50.0f; // Tỉ lệ phóng to tối đa
                     float minScale = 0.5f; // Tỉ lệ thu nhỏ tối thiểu
 
-                    scaleFactor += 0.1f;
-                    scale = Math.max(minScale, Math.min(scaleFactor, maxScale));
+                    currentScale += 0.1f;
+                    scaleFactors.set(idx, currentScale);
+                    float scale = Math.max(minScale, Math.min(currentScale, maxScale));
 
                     ViewGroup.LayoutParams params = currentImageView.getLayoutParams();
                     params.width = (int) (currentImageView.getDrawable().getIntrinsicWidth() * scale);
@@ -376,12 +383,14 @@ public class GhepHinhActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if (currentImageView != null) {
-                    float maxScale = 5.0f; // Tỉ lệ phóng to tối đa
+                    int idx = imageViewList.indexOf(currentImageView);
+                    float currentScale = scaleFactors.get(idx);
+                    float maxScale = 50.0f; // Tỉ lệ phóng to tối đa
                     float minScale = 0.5f; // Tỉ lệ thu nhỏ tối thiểu
 
-                    scaleFactor -= 0.01f;
-                    scale = Math.max(minScale, Math.min(scaleFactor, maxScale));
-
+                    currentScale -= 0.1f;
+                    float scale = Math.max(minScale, Math.min(currentScale, maxScale));
+                    scaleFactors.set(idx, currentScale);
                     ViewGroup.LayoutParams params = currentImageView.getLayoutParams();
                     params.width = (int) (currentImageView.getDrawable().getIntrinsicWidth() * scale);
                     params.height = (int) (currentImageView.getDrawable().getIntrinsicHeight() * scale);
@@ -440,8 +449,8 @@ public class GhepHinhActivity extends AppCompatActivity {
                         if (chooseIdx >= 0) {
                             ImageView imageView = new ImageView(GhepHinhActivity.this);
                             Picasso.get().load(entityList.get(chooseIdx).getSingle_image_url()).into(imageView);
-                            imageView.setScaleX(0.5f);
-                            imageView.setScaleY(0.5f);
+                            imageView.setScaleX(1.0f);
+                            imageView.setScaleY(1.0f);
 
                             FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT);
                             params.leftMargin = (int) dropX; // Tinh chỉnh vị trí x
@@ -451,6 +460,7 @@ public class GhepHinhActivity extends AppCompatActivity {
                             setTouchListener(imageView);
                             imageViewList.add(imageView);
                             idxTemp.add(chooseIdx);
+                            scaleFactors.add(1.0f);
                             Log.e("TAG", "onDrag: " + entityList.get(chooseIdx).getName());
                         }
 
@@ -525,6 +535,7 @@ public class GhepHinhActivity extends AppCompatActivity {
             private static final long DOUBLE_CLICK_TIMEOUT = 300; // thời gian cho phép giữa hai lần click (300ms)
             private int clickCount = 0;
             private long lastClickTime = 0;
+
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 switch (event.getAction()) {
@@ -581,6 +592,7 @@ public class GhepHinhActivity extends AppCompatActivity {
             private static final long DOUBLE_CLICK_TIMEOUT = 300; // thời gian cho phép giữa hai lần click (300ms)
             private int clickCount = 0;
             private long lastClickTime = 0;
+
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 switch (event.getAction()) {
@@ -695,16 +707,16 @@ public class GhepHinhActivity extends AppCompatActivity {
     private class ScaleListener extends ScaleGestureDetector.SimpleOnScaleGestureListener {
         @Override
         public boolean onScale(ScaleGestureDetector detector) {
-            if (currentImageView != null) {
-                scale *= detector.getScaleFactor();
-                scale = Math.max(0.1f, Math.min(scale, 10.0f)); // Giới hạn scale từ 0.1x đến 5x
-                ViewGroup.LayoutParams params = null;
-                params = currentImageView.getLayoutParams();
-                params.width = (int) (currentImageView.getDrawable().getIntrinsicWidth() * scale);
-                params.height = (int) (currentImageView.getDrawable().getIntrinsicHeight() * scale);
-                currentImageView.setLayoutParams(params);
-                imageViewList.set(currentIndex, currentImageView);
-            }
+//            if (currentImageView != null) {
+//                scale *= detector.getScaleFactor();
+//                scale = Math.max(0.1f, Math.min(scale, 10.0f)); // Giới hạn scale từ 0.1x đến 5x
+//                ViewGroup.LayoutParams params = null;
+//                params = currentImageView.getLayoutParams();
+//                params.width = (int) (currentImageView.getDrawable().getIntrinsicWidth() * scale);
+//                params.height = (int) (currentImageView.getDrawable().getIntrinsicHeight() * scale);
+//                currentImageView.setLayoutParams(params);
+//                imageViewList.set(currentIndex, currentImageView);
+//            }
 
             return true;
         }

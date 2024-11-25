@@ -41,10 +41,15 @@ public class HinhNenAdapter extends RecyclerView.Adapter<HinhNenAdapter.ViewHold
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+
         HinhNen hinhNen = hinhNenList.get(position);
         holder.tvName.setText(hinhNen.getTen());
         if (hinhNen.getHinhAnh()!=null) {
-            Picasso.get().load(hinhNen.getHinhAnh()).into(holder.imgView);
+            try {
+                Picasso.get().load(hinhNen.getHinhAnh()).into(holder.imgView);
+            } catch (Exception e) {
+                return;
+            }
         }
         holder.itemView.setOnClickListener(v -> listener.onItemClick(hinhNen.getHinhAnh()));
     }

@@ -53,7 +53,9 @@ public class KiHieuTextAdapter extends RecyclerView.Adapter<KiHieuTextAdapter.Vi
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        String loaiKiHieu = kiHieuList.toArray()[position].toString();
+
+        String loaiKiHieu = String.valueOf(kiHieuList.toArray()[position]);
+
         holder.tvName.setText(loaiKiHieu);
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override

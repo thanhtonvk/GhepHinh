@@ -41,11 +41,18 @@ public class KiHieuAdapter extends RecyclerView.Adapter<KiHieuAdapter.ViewHolder
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         KiHieu kiHieu = kiHieuList.get(position);
-        if(kiHieu.getSingle_image_url()!=null){
-            Picasso.get().load(kiHieu.getSingle_image_url()).into(holder.imgView);
+        if (kiHieu != null) {
+            if (kiHieu.getSingle_image_url() != null) {
+                try {
+                    Picasso.get().load(kiHieu.getSingle_image_url()).into(holder.imgView);
+                } catch (Exception e) {
+                    return;
+                }
+            }
+
+            holder.tvName.setText(kiHieu.getName());
         }
 
-        holder.tvName.setText(kiHieu.getName());
         holder.imgView.setOnLongClickListener(v -> {
             ClipData.Item item = new ClipData.Item(position + "");
             ClipData dragData = new ClipData(position + "", new String[]{ClipDescription.MIMETYPE_TEXT_PLAIN}, item);
@@ -57,11 +64,6 @@ public class KiHieuAdapter extends RecyclerView.Adapter<KiHieuAdapter.ViewHolder
         });
     }
 
-    public void updateData(List<KiHieu> newKiHieuList) {
-        kiHieuList.clear();
-        kiHieuList.addAll(newKiHieuList);
-        notifyDataSetChanged();
-    }
 
     @Override
     public int getItemCount() {

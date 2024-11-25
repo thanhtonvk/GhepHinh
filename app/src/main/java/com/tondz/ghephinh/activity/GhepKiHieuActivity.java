@@ -475,8 +475,8 @@ public class GhepKiHieuActivity extends AppCompatActivity {
                         Integer chooseIdx = Integer.parseInt(item.getText().toString());
                         ImageView imageView = new ImageView(GhepKiHieuActivity.this);
                         Picasso.get().load(Common.kiHieuList.get(chooseIdx).getSingle_image_url()).into(imageView);
-                        imageView.setScaleX(0.5f);
-                        imageView.setScaleY(0.5f);
+                        imageView.setScaleX(1.0f);
+                        imageView.setScaleY(1.0f);
 
                         FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT);
                         params.leftMargin = (int) dropX; // Tinh chỉnh vị trí x

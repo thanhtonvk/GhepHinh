@@ -45,7 +45,11 @@ public class TheGioiAdapter extends RecyclerView.Adapter<TheGioiAdapter.ViewHold
         Entity entity = entityList.get(position);
         holder.tvName.setText(entity.getName());
         if (!entity.getSingle_image_url().isEmpty()) {
-            Picasso.get().load(entity.getSingle_image_url()).into(holder.imgView);
+            try {
+                Picasso.get().load(entity.getSingle_image_url()).into(holder.imgView);
+            } catch (Exception e) {
+                return;
+            }
         }
         holder.itemView.setOnClickListener(v -> {
             if (entity.getName().equalsIgnoreCase("việt nam")) {
