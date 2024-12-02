@@ -94,7 +94,6 @@ public class ChauLucActivity extends AppCompatActivity {
 
                         }
 
-
                         reference.child("TheGioi").child(Common.idTheGioi).addValueEventListener(new ValueEventListener() {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot snapshot) {
