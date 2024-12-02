@@ -57,9 +57,9 @@ public class TheGioiActivity extends AppCompatActivity {
                 for (DataSnapshot dataSnapshot :
                         snapshot.getChildren()) {
                     if (dataSnapshot.getKey().equalsIgnoreCase("CauHoi")) {
-                        for (DataSnapshot cauHoiSnapshot : dataSnapshot.getChildren()
+                        for (DataSnapshot snapShotCauHoi : dataSnapshot.getChildren()
                         ) {
-                            Map<String, Object> map = (Map<String, Object>) cauHoiSnapshot.getValue();
+                            Map<String, Object> map = (Map<String, Object>) snapShotCauHoi.getValue();
                             CauHoi cauHoi = new CauHoi(map.get("id").toString(), map.get("cauhoi").toString(), map.get("a").toString(), map.get("b").toString(), map.get("c").toString(), map.get("d").toString(), map.get("dapan").toString());
                             Common.cauHoiArrayList.add(cauHoi);
                         }

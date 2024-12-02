@@ -16,6 +16,7 @@ import com.squareup.picasso.Picasso;
 import com.tondz.ghephinh.AreaActivity;
 import com.tondz.ghephinh.R;
 import com.tondz.ghephinh.activity.chauluc.ChauLucActivity;
+import com.tondz.ghephinh.activity.quocgia.QuocGiaActivity;
 import com.tondz.ghephinh.activity.vietnam.VietNamActivity;
 import com.tondz.ghephinh.models.Entity;
 import com.tondz.ghephinh.utils.Common;
@@ -43,23 +44,27 @@ public class TheGioiAdapter extends RecyclerView.Adapter<TheGioiAdapter.ViewHold
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, @SuppressLint("RecyclerView") int position) {
         Entity entity = entityList.get(position);
-        holder.tvName.setText(entity.getName());
-        if (!entity.getSingle_image_url().isEmpty()) {
-            try {
-                Picasso.get().load(entity.getSingle_image_url()).into(holder.imgView);
-            } catch (Exception e) {
-                return;
-            }
-        }
-        holder.itemView.setOnClickListener(v -> {
-            if (entity.getName().equalsIgnoreCase("việt nam")) {
-                context.startActivity(new Intent(context, VietNamActivity.class));
-            } else {
-                Common.idTheGioi = entity.getId();
-                context.startActivity(new Intent(context, ChauLucActivity.class));
-            }
+        if (entity != null) {
+            holder.tvName.setText(entity.getName());
 
-        });
+            if (entity.getSingle_image_url() != null) {
+                try {
+                    Picasso.get().load(entity.getSingle_image_url()).into(holder.imgView);
+                } catch (Exception e) {
+                    return;
+                }
+            }
+            holder.itemView.setOnClickListener(v -> {
+                if (entity.getName().equalsIgnoreCase("việt nam")) {
+                    context.startActivity(new Intent(context, VietNamActivity.class));
+                } else {
+                    Common.idTheGioi = entity.getId();
+                    context.startActivity(new Intent(context, ChauLucActivity.class));
+                }
+
+            });
+        }
+
     }
 
     @Override

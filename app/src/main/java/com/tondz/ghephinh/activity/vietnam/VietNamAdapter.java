@@ -43,13 +43,20 @@ public class VietNamAdapter extends RecyclerView.Adapter<VietNamAdapter.ViewHold
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, @SuppressLint("RecyclerView") int position) {
         Entity entity = filteredList.get(position);
-        holder.tvName.setText(entity.getName());
-        if (!entity.getSingle_image_url().isEmpty()) {
-            try {
-                Picasso.get().load(entity.getSingle_image_url()).into(holder.imgView);
-            } catch (Exception e) {
-                return;
+        if (entity != null) {
+            holder.tvName.setText(entity.getName());
+
+            if (entity.getSingle_image_url() != null) {
+                try {
+                    Picasso.get().load(entity.getSingle_image_url()).into(holder.imgView);
+                } catch (Exception e) {
+                    return;
+                }
             }
+            holder.itemView.setOnClickListener(v -> {
+                Common.idTinh = entity.getId();
+                context.startActivity(new Intent(context, HuyenActivity.class));
+            });;
         }
     }
 

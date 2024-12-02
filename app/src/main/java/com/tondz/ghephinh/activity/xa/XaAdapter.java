@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.squareup.picasso.Picasso;
 import com.tondz.ghephinh.AreaActivity;
 import com.tondz.ghephinh.R;
+import com.tondz.ghephinh.activity.huyen.HuyenActivity;
 import com.tondz.ghephinh.models.Entity;
 import com.tondz.ghephinh.utils.Common;
 
@@ -43,13 +44,20 @@ public class XaAdapter extends RecyclerView.Adapter<XaAdapter.ViewHolder> {
     @Override
     public void onBindViewHolder(@NonNull XaAdapter.ViewHolder holder, @SuppressLint("RecyclerView") int position) {
         Entity entity = entityList.get(position);
-        holder.tvName.setText(entity.getName());
-        if (!entity.getSingle_image_url().isEmpty()) {
-            try {
-                Picasso.get().load(entity.getSingle_image_url()).into(holder.imgView);
-            } catch (Exception e) {
-                return;
+        if (entity != null) {
+            holder.tvName.setText(entity.getName());
+
+            if (entity.getSingle_image_url() != null) {
+                try {
+                    Picasso.get().load(entity.getSingle_image_url()).into(holder.imgView);
+                } catch (Exception e) {
+                    return;
+                }
             }
+            holder.itemView.setOnClickListener(v -> {
+                Common.idTinh = entity.getId();
+                context.startActivity(new Intent(context, HuyenActivity.class));
+            });;
         }
     }
 

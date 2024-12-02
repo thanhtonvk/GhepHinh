@@ -353,13 +353,16 @@ public class GhepHinhActivity extends AppCompatActivity {
                 if (currentImageView != null) {
                     int idx = imageViewList.indexOf(currentImageView);
                     float currentScale = scaleFactors.get(idx);
+                    Log.d("TAG", "onClick: " + currentScale);
 
-                    float maxScale = 50.0f; // Tỉ lệ phóng to tối đa
-                    float minScale = 0.5f; // Tỉ lệ thu nhỏ tối thiểu
+                    float maxScale = 10.0f; // Tỉ lệ phóng to tối đa
 
-                    currentScale += 0.1f;
+                    currentScale += 0.05f;
+                    if (currentScale > maxScale) {
+                        currentScale = maxScale;
+                    }
                     scaleFactors.set(idx, currentScale);
-                    float scale = Math.max(minScale, Math.min(currentScale, maxScale));
+                    float scale = currentScale;
 
                     ViewGroup.LayoutParams params = currentImageView.getLayoutParams();
                     params.width = (int) (currentImageView.getDrawable().getIntrinsicWidth() * scale);
@@ -385,11 +388,14 @@ public class GhepHinhActivity extends AppCompatActivity {
                 if (currentImageView != null) {
                     int idx = imageViewList.indexOf(currentImageView);
                     float currentScale = scaleFactors.get(idx);
-                    float maxScale = 50.0f; // Tỉ lệ phóng to tối đa
-                    float minScale = 0.5f; // Tỉ lệ thu nhỏ tối thiểu
+                    Log.d("TAG", "onClick: " + currentScale);
+                    float minScale = 0.01f; // Tỉ lệ thu nhỏ tối thiểu
 
-                    currentScale -= 0.1f;
-                    float scale = Math.max(minScale, Math.min(currentScale, maxScale));
+                    currentScale -= 0.05f;
+                    if (currentScale < minScale) {
+                        currentScale = minScale;
+                    }
+                    float scale = currentScale;
                     scaleFactors.set(idx, currentScale);
                     ViewGroup.LayoutParams params = currentImageView.getLayoutParams();
                     params.width = (int) (currentImageView.getDrawable().getIntrinsicWidth() * scale);
@@ -460,7 +466,7 @@ public class GhepHinhActivity extends AppCompatActivity {
                             setTouchListener(imageView);
                             imageViewList.add(imageView);
                             idxTemp.add(chooseIdx);
-                            scaleFactors.add(1.0f);
+                            scaleFactors.add(imageView.getScaleX());
                             Log.e("TAG", "onDrag: " + entityList.get(chooseIdx).getName());
                         }
 

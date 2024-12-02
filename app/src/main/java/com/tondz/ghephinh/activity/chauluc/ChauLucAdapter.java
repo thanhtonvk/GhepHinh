@@ -16,6 +16,7 @@ import com.squareup.picasso.Picasso;
 import com.tondz.ghephinh.AreaActivity;
 import com.tondz.ghephinh.R;
 import com.tondz.ghephinh.activity.quocgia.QuocGiaActivity;
+import com.tondz.ghephinh.activity.tinh.TinhActivity;
 import com.tondz.ghephinh.models.Entity;
 import com.tondz.ghephinh.utils.Common;
 
@@ -35,15 +36,24 @@ public class ChauLucAdapter extends RecyclerView.Adapter<ChauLucAdapter.ViewHold
     @Override
     public void onBindViewHolder(@NonNull ChauLucAdapter.ViewHolder holder, @SuppressLint("RecyclerView") int position) {
         Entity entity = filteredList.get(position);
-        holder.tvName.setText(entity.getName());
-        if (!entity.getSingle_image_url().isEmpty()) {
-            Picasso.get().load(entity.getSingle_image_url()).into(holder.imgView);
+        if (entity != null) {
+            holder.tvName.setText(entity.getName());
+
+            if (entity.getSingle_image_url() != null) {
+                try {
+                    Picasso.get().load(entity.getSingle_image_url()).into(holder.imgView);
+                } catch (Exception e) {
+                    return;
+                }
+            }
+            holder.itemView.setOnClickListener(v -> {
+                Common.idChauLuc = entity.getId();
+                context.startActivity(new Intent(context, QuocGiaActivity.class));
+            });
         }
-        holder.itemView.setOnClickListener(v -> {
-            Common.idChauLuc = entity.getId();
-            context.startActivity(new Intent(context, QuocGiaActivity.class));
-        });
+
     }
+
     Context context;
     List<Entity> entityList;
     private List<Entity> filteredList;

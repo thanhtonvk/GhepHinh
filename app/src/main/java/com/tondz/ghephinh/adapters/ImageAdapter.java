@@ -43,22 +43,27 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Entity entity = filteredList.get(position);
-        holder.tvName.setText(entity.getName());
-        if (entity.getSingle_image_url() != null) {
-            try {
-                Picasso.get().load(entity.getSingle_image_url()).into(holder.imgView);
-            } catch (Exception e) {
-                return;
+        if (entity != null) {
+            if (entity.getName() != null && entity.getSingle_image_url() != null) {
+                holder.tvName.setText(entity.getName());
+
+                try {
+                    Picasso.get().load(entity.getSingle_image_url()).into(holder.imgView);
+                } catch (Exception e) {
+                    return;
+                }
+
+                holder.imgView.setOnLongClickListener(v -> {
+                    ClipData.Item item = new ClipData.Item(entity.getName());
+                    ClipData dragData = new ClipData(entity.getName(), new String[]{ClipDescription.MIMETYPE_TEXT_PLAIN}, item);
+                    Log.e("TAG", "onBindViewHolder: " + entity.getName());
+                    View.DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(holder.imgView);
+                    v.startDragAndDrop(dragData, shadowBuilder, null, 0);
+                    return true;
+                });
             }
+
         }
-        holder.imgView.setOnLongClickListener(v -> {
-            ClipData.Item item = new ClipData.Item(entity.getName());
-            ClipData dragData = new ClipData(entity.getName(), new String[]{ClipDescription.MIMETYPE_TEXT_PLAIN}, item);
-            Log.e("TAG", "onBindViewHolder: " + entity.getName());
-            View.DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(holder.imgView);
-            v.startDragAndDrop(dragData, shadowBuilder, null, 0);
-            return true;
-        });
 
 
     }

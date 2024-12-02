@@ -94,7 +94,7 @@ public class GhepKiHieuActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
         onClick();
         init();
-        Picasso.get().load(Common.entity.getSingle_image_url()).into(binding.imgBackground);
+//        Picasso.get().load(Common.entity.getSingle_image_url()).into(binding.imgBackground);
     }
 
     private void init() {
@@ -654,7 +654,7 @@ public class GhepKiHieuActivity extends AppCompatActivity {
             public boolean onTouch(View v, MotionEvent event) {
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
-                        currentTextView  = null;
+                        currentTextView = null;
                         currentImageView = imageView;
                         lastTouchX = event.getRawX();
                         lastTouchY = event.getRawY();
