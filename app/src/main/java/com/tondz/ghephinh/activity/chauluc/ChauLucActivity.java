@@ -65,6 +65,7 @@ public class ChauLucActivity extends AppCompatActivity {
                         Common.entityList = new ArrayList<>();
                         Common.cauHoiArrayList = new ArrayList<>();
                         Common.previewList.clear();
+                        Common.hinhGhepList.clear();
                         for (DataSnapshot dataSnapshot :
                                 snapshot.getChildren()) {
                             if (dataSnapshot.getKey().equalsIgnoreCase("CauHoi")) {
@@ -80,13 +81,18 @@ public class ChauLucActivity extends AppCompatActivity {
                                     Preview preview = previewSnapshot.getValue(Preview.class);
                                     Common.previewList.add(preview);
                                 }
+                            } else if (dataSnapshot.getKey().equalsIgnoreCase("HinhNen")) {
+                                for (DataSnapshot hinhNenSnapshot : dataSnapshot.getChildren()
+                                ) {
+                                    Common.hinhGhepList.add(hinhNenSnapshot.getValue(HinhNen.class));
+                                }
+
                             } else {
                                 Entity entity = dataSnapshot.getValue(Entity.class);
                                 Common.entityList.add(entity);
                             }
 
                         }
-
 
                         reference.child("TheGioi").child(Common.idTheGioi).addValueEventListener(new ValueEventListener() {
                             @Override

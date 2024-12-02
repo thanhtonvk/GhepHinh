@@ -354,12 +354,14 @@ public class GhepHinhActivity extends AppCompatActivity {
                     int idx = imageViewList.indexOf(currentImageView);
                     float currentScale = scaleFactors.get(idx);
 
-                    float maxScale = 50.0f; // Tỉ lệ phóng to tối đa
-                    float minScale = 0.5f; // Tỉ lệ thu nhỏ tối thiểu
+                    float maxScale = 50.0f;
 
-                    currentScale += 0.1f;
+                    currentScale += 0.05f;
+                    if (currentScale > maxScale) {
+                        currentScale = maxScale;
+                    }
                     scaleFactors.set(idx, currentScale);
-                    float scale = Math.max(minScale, Math.min(currentScale, maxScale));
+                    float scale = currentScale;
 
                     ViewGroup.LayoutParams params = currentImageView.getLayoutParams();
                     params.width = (int) (currentImageView.getDrawable().getIntrinsicWidth() * scale);
@@ -385,11 +387,12 @@ public class GhepHinhActivity extends AppCompatActivity {
                 if (currentImageView != null) {
                     int idx = imageViewList.indexOf(currentImageView);
                     float currentScale = scaleFactors.get(idx);
-                    float maxScale = 50.0f; // Tỉ lệ phóng to tối đa
-                    float minScale = 0.5f; // Tỉ lệ thu nhỏ tối thiểu
-
-                    currentScale -= 0.1f;
-                    float scale = Math.max(minScale, Math.min(currentScale, maxScale));
+                    float minScale = 0.05f; // Tỉ lệ thu nhỏ tối thiểu
+                    currentScale -= 0.05f;
+                    if (currentScale < minScale) {
+                        currentScale = minScale;
+                    }
+                    float scale = currentScale;
                     scaleFactors.set(idx, currentScale);
                     ViewGroup.LayoutParams params = currentImageView.getLayoutParams();
                     params.width = (int) (currentImageView.getDrawable().getIntrinsicWidth() * scale);
